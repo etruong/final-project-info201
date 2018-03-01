@@ -29,3 +29,5 @@ GetContent <- function(resource, query.params) {
   api.data <- fromJSON (body) 
   return (api.data)
 }
+
+
