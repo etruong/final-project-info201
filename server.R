@@ -6,13 +6,16 @@ library("jsonlite")
 library("ggplot2")
 library("shiny")
 
+
+# If there's time, we could also take a look at the correlation between the number of reviews and the rating
+
 yelp.data <- read.csv("data/zip-code-data.csv")
 cuisines <- c("American", "Caribbean", "Chinese", "French", "German", "Greek", "Indian", "Italian", 
               "Japanese", "Mediterranean", "Mexican", "Thai", "Vietnamese")
 yelp.data <- distinct(yelp.data, id, name, review_count, rating, price, 
                       phone, coordinates.latitude, coordinates.longitude, 
-                      location.address1, location.city, location.zip_code, location.country, location.state)
-
+                      location.address1, location.city, location.zip_code, location.country, location.state, category)
+View(yelp.data)
 
 my.server <- function (input, output, session) {
   
@@ -22,9 +25,8 @@ my.server <- function (input, output, session) {
   # Tyler's Page
   output$plot <- renderPlot({
     curr.data <- na.omit(yelp.data %>%
-                           # filter(review_count >= 50) %>%
+                           filter(review_count >= 100) %>%
                            select(name, category, rating, review_count))
-    View(curr.data)
     summary <- curr.data %>%
       group_by(category) %>%
       summarize(std.dev = sd(rating), mean = mean(rating), median = median(rating))
