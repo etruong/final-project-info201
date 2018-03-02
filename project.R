@@ -30,4 +30,10 @@ GetContent <- function(resource, query.params) {
   return (api.data)
 }
 
+resource <- "businesses/search"
+query.params <- list (term = "restaurants", location = "98178", price = "$", limit = 50)
+data <- GetContent (resource, query.params)
+data <- data[1]
 
+ggplot (data) +
+  geom_bar (mapping = aes (x = price))
