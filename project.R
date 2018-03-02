@@ -31,3 +31,9 @@ GetContent <- function(resource, query.params) {
 }
 
 
+# Example call
+# resource <- "businesses/search"
+# query.params <- list(term = "restaurants", location = "Seattle, Washington, 98195", limit = 50)
+# 
+# data <- GetContent(resource, query.params)
+# View(data$businesses)

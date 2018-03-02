@@ -1,5 +1,9 @@
 library ("shiny")
 
+cusines <- c("American", "caribbean", "Chinese", "French", "German", "Greek", "Indian", "Italian", 
+            "Japanese", "Mediterranean", "Mexican", "Thai", "Vietnamese")
+
+
 my.ui <- fluidPage (
   
   #includeCSS("styles.css"),
@@ -33,7 +37,13 @@ my.ui <- fluidPage (
              
              tabPanel ("Question 3",
                        titlePanel("Title"),
-                       p ("Description of question attempting to answer"))
+                       h2("What types of cuisines are more successful in Seattle?"),
+                       sidebarLayout(
+                         radioButtons('visual',
+                                    choices = c("Boxplot", "Table", "Cloud")),
+                         selectInput('cuisine', 
+                                     choices = cuisines)
+                       ))
   )
 )
 
