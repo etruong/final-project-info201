@@ -1,6 +1,14 @@
-library ("shiny")
+library("knitr")
+library("dplyr")
+library("ggplot2")
+library("httr")
+library("jsonlite")
+library("ggplot2")
+library("shiny")
 
-cusines <- c("American", "caribbean", "Chinese", "French", "German", "Greek", "Indian", "Italian", 
+yelp.data <- read.csv("data/zip-code-data.csv")
+
+cuisines <- c("American", "Caribbean", "Chinese", "French", "German", "Greek", "Indian", "Italian", 
             "Japanese", "Mediterranean", "Mexican", "Thai", "Vietnamese")
 
 
@@ -36,13 +44,18 @@ my.ui <- fluidPage (
                        p ("Which locations are ideal for vegetarians?")),
              
              tabPanel ("Question 3",
-                       titlePanel("Title"),
-                       h2("What types of cuisines are more successful in Seattle?"),
+                       titlePanel(h3("Which Types of Cuisines Are Most Successful in Seattle?")),
                        sidebarLayout(
                          radioButtons('visual',
-                                    choices = c("Boxplot", "Table", "Cloud")),
-                         selectInput('cuisine', 
-                                     choices = cuisines)
+                                      label = h3("Visual"),
+                                      choices = c("Boxplot", "Table", "Cloud")),
+                         checkboxGroupInput('cuisine',
+                                            label = h3("Cuisine"), 
+                                            choices = cuisines,
+                                            selected = cuisines[1])
+                       ),
+                       mainPanel(
+                         plotOutput('plot')
                        ))
   )
 )
