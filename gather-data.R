@@ -1,8 +1,9 @@
 source('project.R')
 library(dplyr)
 
-cuisines <- c("american", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "indian", "italian", 
-             "japanese", "mediterranean", "mexican","shanghainese", "thai", "vietnamese")
+cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
+             "japanese", "korean", "mediterranean", "mexican", "newamerican", "shanghainese", "taiwanese", "thai", 
+             "tradamerican", "vietnamese")
 
 # 98101 not included because it is used as an initial parameter
 zip.codes <- c("98102", "98103", "98104", "98105", "98106", "98107", "98108", "98109",
@@ -32,7 +33,6 @@ for (zip in zip.codes) {
   zip.data <- rbind(zip.data, data)
 }
 
-unique.zip <- distinct(zip.data, "id")
 to.csv.zip <- select(zip.data, id, name, image_url, is_closed, url, review_count, rating, price, 
                      phone, display_phone, distance, coordinates.latitude, coordinates.longitude, 
                      location.address1, location.city, location.zip_code, location.country, location.state)

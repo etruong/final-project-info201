@@ -8,8 +8,9 @@ library("shiny")
 
 yelp.data <- read.csv("data/zip-code-data.csv")
 
-cuisines <- c("American", "Caribbean", "Chinese", "French", "German", "Greek", "Indian", "Italian", 
-            "Japanese", "Mediterranean", "Mexican", "Thai", "Vietnamese")
+cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
+              "japanese", "korean", "mediterranean", "mexican", "newamerican", "shanghainese", "taiwanese", "thai", 
+              "tradamerican", "vietnamese")
 
 
 my.ui <- fluidPage (
