@@ -2,7 +2,7 @@ source('project.R')
 library(dplyr)
 
 cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
-             "japanese", "korean", "mediterranean", "mexican", "newamerican", "shanghainese", "taiwanese", "thai", 
+             "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
              "tradamerican", "vietnamese")
 
 # 98101 not included because it is used as an initial parameter

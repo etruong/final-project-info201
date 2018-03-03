@@ -6,15 +6,16 @@ library("jsonlite")
 library("ggplot2")
 library("shiny")
 
+library("shinyjs")
+
 yelp.data <- read.csv("data/zip-code-data.csv")
 
 cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
-              "japanese", "korean", "mediterranean", "mexican", "newamerican", "shanghainese", "taiwanese", "thai", 
+              "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
               "tradamerican", "vietnamese")
 
 
 my.ui <- fluidPage (
-  
   #includeCSS("styles.css"),
   
   navbarPage ("INFO 201 Application",
@@ -47,17 +48,20 @@ my.ui <- fluidPage (
              tabPanel ("Question 3",
                        titlePanel(h3("Which Types of Cuisines Are Most Successful in Seattle?")),
                        sidebarLayout(
-                         radioButtons('visual',
-                                      label = h3("Visual"),
-                                      choices = c("Boxplot", "Table", "Cloud")),
-                         checkboxGroupInput('cuisine',
-                                            label = h3("Cuisine"), 
-                                            choices = cuisines,
-                                            selected = cuisines[1])
-                       ),
-                       mainPanel(
-                         plotOutput('plot')
-                       ))
+                         sidebarPanel(
+                           checkboxGroupInput('cuisine',
+                                              label = h3("Cuisine"), 
+                                              choices = cuisines,
+                                              selected = cuisines[1])
+                      ),
+                         mainPanel(
+                           tabsetPanel(
+                             tabPanel("Plot", plotOutput('plot')),
+                             tabPanel("Table", tableOutput('table'))
+                           )
+                      )
+                    )
+             )
   )
 )
 

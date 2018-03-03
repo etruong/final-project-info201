@@ -13,7 +13,7 @@ library("shiny")
 
 yelp.data <- read.csv("data/zip-code-data.csv")
 cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
-              "japanese", "korean", "mediterranean", "mexican", "newamerican", "shanghainese", "taiwanese", "thai", 
+              "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
               "tradamerican", "vietnamese")
 yelp.data <- distinct(yelp.data, id, name, review_count, rating, price, 
                       phone, coordinates.latitude, coordinates.longitude, 
@@ -26,32 +26,30 @@ my.server <- function (input, output, session) {
   
   # Tyler's Page
   output$plot <- renderPlot({
-    # print(input$cuisine)
     curr.data <- na.omit(yelp.data %>%
                            filter(review_count >= 100 & (category %in% input$cuisine)) %>%
                            select(name, category, rating, review_count))
-    # summary <- curr.data %>%
-    #   group_by(category) %>%
-    #   summarize(std.dev = sd(rating), mean = mean(rating), median = median(rating))
-     grouped.data <- curr.data %>%
-       group_by(category) %>%
-       filter((rating > mean(rating) - 3 * sd(rating)) & (rating < mean(rating) + 3 * sd(rating)))
-    ggplot(data = grouped.data, aes(x = category, y = rating, fill = category)) +
+    grouped.data <- curr.data %>%
+      group_by(category) %>%
+      filter((rating > mean(rating) - 3 * sd(rating)) & (rating < mean(rating) + 3 * sd(rating)))
+    plot <- ggplot(data = grouped.data, aes(x = category, y = rating, fill = category)) +
       geom_boxplot() +
-      theme(axis.text.x = element_blank(),
-            axis.ticks.x = element_blank())
-    
-    
+      theme(axis.text.x = element_text(angle = 90, hjust = 1),
+            axis.ticks.x = element_blank()) +
+      labs(title = "Cuisine vs Rating", x = "Cuisine", y = "Rating")
+    return(plot)
   })
   
-  output$table <- renderDataTable({
-    
+  output$table <- renderTable({
+    curr.data <- na.omit(yelp.data %>%
+                           filter(review_count >= 100 & (category %in% input$cuisine)) %>%
+                           select(name, category, rating, review_count))
+    summary <- curr.data %>%
+      group_by(category) %>%
+      summarise(std.dev = sd(rating), mean = mean(rating), median = median(rating))
+    colnames(summary) <- c("Cuisine", "Standard Deviatation", "Mean", "Median")
+    return(summary)
   })
-  
-  output$cloud <- renderPlot({
-    
-  })
-  
 }
 
 shinyServer (my.server)
