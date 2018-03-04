@@ -29,8 +29,3 @@ GetContent <- function(resource, query.params) {
   api.data <- fromJSON (body) 
   return (api.data)
 }
-
-resource <- "businesses/search"
-query.params <- list (term = "restaurants", location = "98178", price = "$", limit = 50)
-data <- GetContent (resource, query.params)
-data <- data[1]
