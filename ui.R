@@ -34,7 +34,8 @@ my.ui <- fluidPage (
                        titlePanel(h3("Which locations are more likely for a business to fail?")),
                        sidebarLayout(
                          sidebarPanel(
-                           checkboxGroupInput('zip.code', "Select one or more zip codes: ", c("all", 98020, 98026, 98028, 98047, 98056,
+                           # Allows the user to choose one or more zip codes
+                           checkboxGroupInput('zip.code', "Select one or more zip codes: ", c(98020, 98026, 98028, 98047, 98056,
                                                                                               98057, 98101, 98102, 98103, 98104,
                                                                                               98105, 98106, 98107, 98108, 98109,
                                                                                               98112, 98115, 98116, 98117, 98118,
@@ -42,7 +43,7 @@ my.ui <- fluidPage (
                                                                                               98127, 98133, 98134, 98136, 98144,
                                                                                               98146, 98154, 98155, 98161, 98166,
                                                                                               98168, 98177, 98178, 98188, 98195,
-                                                                                              98199, 98346), selected = c("all"))
+                                                                                              98199, 98346), selected = c(98020))
                          ),
                          mainPanel(
                              tabsetPanel(
