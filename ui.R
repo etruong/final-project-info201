@@ -49,6 +49,8 @@ my.ui <- fluidPage (
                        titlePanel(h3("Which Types of Cuisines Are Most Successful in Seattle?")),
                        sidebarLayout(
                          sidebarPanel(
+                           actionButton('select.all', label = "Select All"),
+                           actionButton('deselect.all', label = "Deselect All"),
                            checkboxGroupInput('cuisine',
                                               label = h3("Cuisine"), 
                                               choices = cuisines,
@@ -57,12 +59,16 @@ my.ui <- fluidPage (
                          mainPanel(
                            tabsetPanel(
                              tabPanel("Plot", plotOutput('plot')),
-                             tabPanel("Table", tableOutput('table'))
-                           )
+                             tabPanel("Table", dataTableOutput('table'))
+                           ),
+                           textOutput('conclusion')
                       )
                     )
+             ),
+             
+             tabPanel("Question 4",
+                      tabPanel("Scatter", plotOutput('scatter'))
              )
   )
 )
-
 shinyUI (my.ui)
