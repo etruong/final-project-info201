@@ -170,7 +170,26 @@ my.ui <- fluidPage (
                                           having a longer opening time may mean more money to gain during
                                           those hours or more importantly an opportunity for more people
                                           to visit the restaraunt."), strong ("The Data"),
-                                       p ("One apparent observation is evident"))
+                                       p ("Overall, there does not seem like any significant relationship between opening and
+                                          closing times and ratings, but there is evidently common features that 
+                                          higher rated restaraunts have. Higher rated restaraunts seem to on average
+                                          open later in the day (the evening) in comparison to lower rated restaraunts
+                                          that open earlier. A likely explanation for this observation is that higher rated restaraunts
+                                          because they are successful are able to afford opening later in the day while
+                                          low rated restaraunts need to be open longer. This was one of the
+                                          only unique observation when comparing high and low rated restaraunts.
+                                          Common and expected observations is that a majority of the restaraunts opened
+                                          around 10:30AM and closed around 8:00PM to 10:00PM."),
+                                       strong ("Limitations"),
+                                       p ("We are unable to draw conclusive information from this data for several reasons. 
+                                          The data is based on the average times restaraunts are open or closed which was
+                                          calculated by averaging the times a restaraunt closes within a week. A restaraunts
+                                          closing and opening times can be significantly altered by outliers. For example,
+                                          if a restaraunt were to open at 10:30AM for five days a week, but open at 5:00PM
+                                          (or 17:00) on one day of the week, this could yield an observation that does not
+                                          accurately display the data of one restaraunt. In a larger scale, if this occurred
+                                          for all of the data, this could significantly skew our results. Our group made the
+                                          assumption that this was not the case."))
                            )
                            
                          ),
