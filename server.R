@@ -67,7 +67,7 @@ my.server <- function (input, output, session) {
   })
   
   # Creates a sentence about the average ratings for the selected zip codes
-  output$info <- renderPrint({
+  output$info <- renderText({
     input.vector <- c(input$zip.code)
     zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
     averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
@@ -80,6 +80,7 @@ my.server <- function (input, output, session) {
     average.rate.min <- averages.rate[averages.rate.min.row, "location.zip_code"]
     
     # Prints out information about the zip code and average rating for it
+    
     sentence <- paste0("The selected zip code(s) is/are: ", 
                        averages.rate[,"location.zip_code"], " and the corresponding rating(s) is/are: ",
                        averages.rate[,"mean"],
