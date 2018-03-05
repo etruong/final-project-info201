@@ -72,7 +72,7 @@ my.ui <- fluidPage (
                                                                               tags$li ("Fun Fact: I love food, K-dramas and photography.")),
                                            tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
                                                                                 tags$li ("Interest")),
-                                           tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended CSE"), tags$li ("Year: 2nd"),
+                                           tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended Informatics"), tags$li ("Year: 2nd"),
                                                                                 tags$li ("Interest")))
                         )),
               
@@ -139,7 +139,7 @@ my.ui <- fluidPage (
                          
                        )),
              
-             tabPanel ("Question 3",
+             tabPanel ("Cuisine",
                        titlePanel(h3("Which Types of Cuisines Are Most Successful in Seattle?")),
                        sidebarLayout(
                          sidebarPanel(
