@@ -1,4 +1,6 @@
 source ("project.R")
+library ("DT")
+library ("plotly")
 
 ########################
 ## SET UP FOR WIDGETS ##
@@ -29,15 +31,18 @@ my.ui <- fluidPage (
   
   includeCSS("styles.css"),
   
-  navbarPage ("INFO 201 Application",
+  navbarPage (p ("INFO 201 Application"),
           
-              tabPanel ("Home", id = "about-pg", tags$img (src = "logo-2.jpg", width = "100px", height = "100px"), h1 ("Welcome!"), p ("This application explores the Yelp Fusion
-                                                     API ( for more details ", a ("click here", href = "https://www.google.com"),
-                                                     ") to answer the question about specific elements of a restaraunt in", strong ("Seattle"),
-                                                     "."),
-                        p ("Below details the specific elements of a restaraunt our team explored. You can click the above tags to
-                           view how we answered these questions"),
-                        tags$ul (tags$li ("Location"), tags$li ("Times"), tags$li ("Cuisine"))),
+              tabPanel ("Home", id = "home-page", p (class = "center", tags$img (src = "www/logo.svg", width = "250px", height = "250px")), h1 ("Welcome!", class = "center"), 
+                        p (class = "center", "This application explores the Yelp Fusion API ( for more details ", a ("click here", href = "https://www.google.com"),
+                        ") to answer the question:"), p (id = "main-ques", class = "center", "What factors make a successful business (food restaraunt)?"),
+                        p (class = "center", "Below details the specific elements of a restaraunt our team explored. You can click the above tags to
+                        view how we answered these questions"),
+                        tags$ul (class = "center", 
+                                 tags$li (class = "index", "Location: Does restaraunt locations influence the rating?"), 
+                                 tags$li (class = "index", em ("Opening/Closing Times:"), br(), "Is the opening and closing times of a restaraunt related to a restaraunt's success?"), 
+                                 tags$li (class = "index", "Cuisine: "),
+                                 tags$li (class = "index", "Price:", br(), "Does food price determine a business' success rate?"))),
               
               tabPanel ("Search", DTOutput ("output.all")),
               
@@ -112,41 +117,70 @@ my.ui <- fluidPage (
                          #            choices = cuisines)
                        ),
              
-             tabPanel ("Restaraunt Name",
-                       titlePanel ("Length of Restaraunt Name"),
-                       sidebarLayout (
-                         
+             tabPanel ("Hours",
+                       titlePanel ("Restaraunt Hours"),
+                       sidebarLayout(
                          sidebarPanel (
-                           p ("Question:"), h4 ("Is the length of a restaraunt's name related
-                                                   to a restaraunt's success?"), hr (),
-                           selectInput ("location.name", label = "Pick a zip code in the Seattle area to analyze:", choices = zip.codes),
-                           actionButton ("all.location", label = "View All Locations"), br (), br(),
-                           sliderInput ("length", label = "Choose", min = 0, max = 100, value = 0)
-                           
-                         ),
-                         
+                           p ("Question:"), h4 ("Is the opening and closing times of a restaraunt
+                                                related to a restaraunt's success?"), hr (),
+                           p ("Manipulate the visualization by clicking the legend for a specific value you'd
+                              like to see or click and dragging a specific area to zoom in.")                         ),
                          mainPanel (
+                           tabsetPanel (
+                             tabPanel ("Opening Hours", h3 ("Opening Hours and Restaraunt Ratings"),
+                                       p ("The graph reveals data on the number of restaraunts which opens at a specific time
+                                          on average based on the ratings. Thus by interacting with the graph you can
+                                          analyze the most common times that 5.0 rated or a specific rated restaraunts you are interested in
+                                          are open.", em ("Note: The times are based on a 24 hour time format.")), plotlyOutput ("open.hour.graph")),
+                             tabPanel ("Closing Hours", h3 ("Closing Hours and Restaraunt Ratings"), 
+                                       p ("The graph reveals data on the number of restaraunts which closes at a specific time
+                                          on average based on the ratings. Thus by interacting with the graph you can
+                                          analyze the most common times that 5.0 rated or a specific rated restaraunts you are interested in
+                                          are closed.", em ("Note: The times are based on a 24 hour time format.")), plotlyOutput ("close.hour.graph")),
+                             tabPanel ("Analysis", h3 ("Analysis"), strong ("Background Information"),
+                                       p ("In this section, we analyzed whether opening or closing times
+                                          were related to the restaraunt's success. A successful business
+                                          was operationally defined as the overall rating of a business
+                                          because a rating considers the quality of food, service, and
+                                          environment that a restaraunt has. Additionally, a higher rating
+                                          tends to attract more customers. Thus, our group defined a
+                                          successful business as having a high rating. Analyzing
+                                          a restaraunt's opening and closing time is an interesting aspect
+                                          that possibly contributes to a restaraunts success because
+                                          having a longer opening time may mean more money to gain during
+                                          those hours or more importantly an opportunity for more people
+                                          to visit the restaraunt."), strong ("The Data"),
+                                       p ("One apparent observation is evident"))
+                           )
                            
                          ),
                          position = "left",
                          fluid = TRUE
                        )
-                       ),
-             
-             tabPanel ("Hours",
-                       titlePanel ("")
                        
              ),
              
-             tabPanel ("About", h2 ("The Team"),
-                       tags$img (src = "", alt = ""),
-                       tags$ul (
-                         tags$li ("Elisa Truong"), tags$ul (tags$li ("Major: Intending HCDE or Design"), tags$li ("Year: 2nd"),
-                                                            tags$li ("My interest")),
-                         tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
-                                                              tags$li ("Interest")),
-                         tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
-                                                              tags$li ("Interest"))))
+             tabPanel ("About", h2 ("About", class = "center"), 
+                       h3 ("The Project", class = "center divider"),
+                       p (class = "center", em ("Title of application"), " was created for our INFO 201 (Technical Foundations of Informatics) assignment with Professor Joel Ross.
+                          As a group, we were challenged to create our own application that would answer several critical questions
+                          about a specific dataset. The API of our choosing was the Yelp Fusion API because the dataset provided
+                          interesting data about food."),
+                       h3 ("The Process", class = "center divider"),
+                       p (class = "center", "We faced several"),
+                       h3 ("The Team", class = "center divider"),
+                       tags$div (id = "about-section", 
+                                 tags$div (id = "about-img", tags$img (class = "img-icon", src = "www/elisa.jpg"),
+                                           tags$img (class = "img-icon", src = "www/elisa.jpg"),
+                                           tags$img (class = "img-icon", src = "www/elisa.jpg")),
+                                 tags$ul (id = "about-info",
+                                   tags$li ("Elisa Truong"), tags$ul (tags$li ("Major: Intending HCDE or Design"), tags$li ("Year: 2nd"),
+                                                                      tags$li ("Fun Fact: I love food, K-dramas and photography.")),
+                                   tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
+                                                                        tags$li ("Interest")),
+                                   tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended CSE"), tags$li ("Year: 2nd"),
+                                                                        tags$li ("Interest")))
+                                 ))
   )
 )
 
