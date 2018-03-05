@@ -8,12 +8,12 @@ library("shiny")
 source ("project.R")
 library ("DT")
 library ("plotly")
+# install.packages("shinyjs")
+library("shinyjs")
 
 ########################
 ## SET UP FOR WIDGETS ##
 ########################
-
-library("shinyjs")
 
 yelp.data <- read.csv("data/zip-code-data.csv")
 
@@ -40,7 +40,6 @@ ratings <- sort (ratings)
 ################
 
 my.ui <- fluidPage (
-  #includeCSS("styles.css"),
   includeCSS("styles.css"),
   
   navbarPage (p ("INFO 201 Application"),
