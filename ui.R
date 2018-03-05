@@ -44,6 +44,26 @@ my.ui <- fluidPage (
                                  tags$li (class = "index", "Cuisine: "),
                                  tags$li (class = "index", "Price:", br(), "Does food price determine a business' success rate?"))),
               
+              tabPanel ("About", h2 ("About", class = "center"), 
+                        h3 ("The Project", class = "center divider"),
+                        p (class = "center", em ("Title of application"), " was created for our INFO 201 (Technical Foundations of Informatics) assignment with Professor Joel Ross.
+                           As a group, we were challenged to create our own application that would answer several critical questions
+                           about a specific dataset. The API of our choosing was the Yelp Fusion API because the dataset provided
+                           interesting data about food."),
+                        h3 ("The Team", class = "center divider"),
+                        tags$div (id = "about-section", 
+                                  tags$div (id = "about-img", tags$img (class = "img-icon", src = "www/elisa.jpg"),
+                                            tags$img (class = "img-icon", src = "www/elisa.jpg"),
+                                            tags$img (class = "img-icon", src = "www/elisa.jpg")),
+                                  tags$ul (id = "about-info",
+                                           tags$li ("Elisa Truong"), tags$ul (tags$li ("Major: Intending HCDE or Design"), tags$li ("Year: 2nd"),
+                                                                              tags$li ("Fun Fact: I love food, K-dramas and photography.")),
+                                           tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
+                                                                                tags$li ("Interest")),
+                                           tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended CSE"), tags$li ("Year: 2nd"),
+                                                                                tags$li ("Interest")))
+                        )),
+              
               tabPanel ("Search", DTOutput ("output.all")),
               
              ##### Person assigned to 
@@ -160,27 +180,8 @@ my.ui <- fluidPage (
                        
              ),
              
-             tabPanel ("About", h2 ("About", class = "center"), 
-                       h3 ("The Project", class = "center divider"),
-                       p (class = "center", em ("Title of application"), " was created for our INFO 201 (Technical Foundations of Informatics) assignment with Professor Joel Ross.
-                          As a group, we were challenged to create our own application that would answer several critical questions
-                          about a specific dataset. The API of our choosing was the Yelp Fusion API because the dataset provided
-                          interesting data about food."),
-                       h3 ("The Process", class = "center divider"),
-                       p (class = "center", "We faced several"),
-                       h3 ("The Team", class = "center divider"),
-                       tags$div (id = "about-section", 
-                                 tags$div (id = "about-img", tags$img (class = "img-icon", src = "www/elisa.jpg"),
-                                           tags$img (class = "img-icon", src = "www/elisa.jpg"),
-                                           tags$img (class = "img-icon", src = "www/elisa.jpg")),
-                                 tags$ul (id = "about-info",
-                                   tags$li ("Elisa Truong"), tags$ul (tags$li ("Major: Intending HCDE or Design"), tags$li ("Year: 2nd"),
-                                                                      tags$li ("Fun Fact: I love food, K-dramas and photography.")),
-                                   tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
-                                                                        tags$li ("Interest")),
-                                   tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended CSE"), tags$li ("Year: 2nd"),
-                                                                        tags$li ("Interest")))
-                                 ))
+             tabPanel ("Conclusion", h2 ("Conclusion", class = "center"),
+                       p ("Blah, blah"))
   )
 )
 
