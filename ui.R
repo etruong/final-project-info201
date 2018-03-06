@@ -1,13 +1,30 @@
+library("knitr")
+library("dplyr")
+library("ggplot2")
+library("httr")
+library("jsonlite")
+library("ggplot2")
+library("shiny")
 source ("project.R")
 library ("DT")
 library ("plotly")
+# install.packages("shinyjs")
+library("shinyjs")
+library("maps")
+library("tidyr")
+library(sp)
+library(maptools)
+library(rsconnect)
 
 ########################
 ## SET UP FOR WIDGETS ##
 ########################
 
-cusines <- c("American", "caribbean", "Chinese", "French", "German", "Greek", "Indian", "Italian", 
-            "Japanese", "Mediterranean", "Mexican", "Thai", "Vietnamese")
+yelp.data <- read.csv("data/zip-code-data.csv")
+
+cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
+              "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
+              "tradamerican", "vietnamese")
 
 prices <- c ("$", "$$", "$$$", "$$$$")
 zip.codes <- c("All Locations", "98101", "98102", "98103", "98104", "98105", "98106", "98107", "98108", "98109",
@@ -31,45 +48,71 @@ my.ui <- fluidPage (
   
   includeCSS("styles.css"),
   
-  navbarPage (p ("INFO 201 Application"),
+  navbarPage (p (id = "app-title", tags$img (src = "logo.svg", width = "20px", height = "20px"), "Food Success"),
           
-              tabPanel ("Home", id = "home-page", p (class = "center", tags$img (src = "www/logo.svg", width = "250px", height = "250px")), h1 ("Welcome!", class = "center"), 
-                        p (class = "center", "This application explores the Yelp Fusion API ( for more details ", a ("click here", href = "https://www.google.com"),
-                        ") to answer the question:"), p (id = "main-ques", class = "center", "What factors make a successful business (food restaraunt)?"),
-                        p (class = "center", "Below details the specific elements of a restaraunt our team explored. You can click the above tags to
-                        view how we answered these questions"),
-                        tags$ul (class = "center", 
-                                 tags$li (class = "index", "Location: Does restaraunt locations influence the rating?"), 
-                                 tags$li (class = "index", em ("Opening/Closing Times:"), br(), "Is the opening and closing times of a restaraunt related to a restaraunt's success?"), 
-                                 tags$li (class = "index", "Cuisine: "),
-                                 tags$li (class = "index", "Price:", br(), "Does food price determine a business' success rate?"))),
+              tabPanel ("Home", tags$div (id = "welcome-page",
+                        p (class = "center", tags$img (id = "main-logo", src = "logo.svg", width = "250px", height = "250px")), h1 ("Welcome!", class = "center"), 
+                        p (class = "center", "This application explores the Yelp Fusion API ( for more details ", a ("click here", href = "https://www.yelp.com/fusion"),
+                        ") to answer the question:"), p (id = "main-ques", class = "center", "What factors make a successful food business?"),
+                        p (class = "center", "Start exploring this application by clicking the above tabs")), 
+                        tags$div (id = "index-section",
+                          h4 (class = "center", id = "index-title", "Index"),
+                          tags$ul (
+                                   tags$li (class = "index", "Location: Does restaraunt locations influence the rating?"), 
+                                   tags$li (class = "index", "Opening/Closing Times: Is the opening and closing times of a restaraunt related to a restaraunt's success?"), 
+                                   tags$li (class = "index", "Cuisine: Which Types of Cuisines Are Most Successful in Seattle?"),
+                                   tags$li (class = "index", "Price: Does food price determine a business' success rate?")))),
               
               tabPanel ("About", h2 ("About", class = "center"), 
                         h3 ("The Project", class = "center divider"),
-                        p (class = "center", em ("Title of application"), " was created for our INFO 201 (Technical Foundations of Informatics) assignment with Professor Joel Ross.
+                        p (class = "center", em ("Food Success"), " was created for our INFO 201 (Technical Foundations of Informatics with Professor Joel Ross) assignment.
                            As a group, we were challenged to create our own application that would answer several critical questions
                            about a specific dataset. The API of our choosing was the Yelp Fusion API because the dataset provided
                            interesting data about food."),
                         h3 ("The Team", class = "center divider"),
                         tags$div (id = "about-section", 
-                                  tags$div (id = "about-img", tags$img (class = "img-icon", src = "www/elisa.jpg"),
-                                            tags$img (class = "img-icon", src = "www/elisa.jpg"),
-                                            tags$img (class = "img-icon", src = "www/elisa.jpg")),
+                                  tags$div (id = "about-img", tags$img (class = "img-icon", src = "elisa.jpg"),
+                                            tags$img (class = "img-icon", src = "itsumi.jpg"),
+                                            tags$img (class = "img-icon", src = "tyler.jpg")),
                                   tags$ul (id = "about-info",
                                            tags$li ("Elisa Truong"), tags$ul (tags$li ("Major: Intending HCDE or Design"), tags$li ("Year: 2nd"),
                                                                               tags$li ("Fun Fact: I love food, K-dramas and photography.")),
                                            tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
                                                                                 tags$li ("Interest")),
-                                           tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended CSE"), tags$li ("Year: 2nd"),
+                                           tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended Informatics"), tags$li ("Year: 2nd"),
                                                                                 tags$li ("Interest")))
                         )),
               
               tabPanel ("Search", DTOutput ("output.all")),
               
-             ##### Person assigned to 
-             tabPanel ("Location",
-                       titlePanel ("Title"),
-                       p ("Which locations are more likely for a business to fail?")),
+             
+              tabPanel ("Location",
+                       titlePanel(h3("Best and Worst Business Locations")),
+                       sidebarLayout(
+                         sidebarPanel(
+                           p ("Question:"), h4 ("Which locations are more likely for a business to fail?"), hr (),
+                           # Allows the user to choose one or more zip codes
+                           checkboxGroupInput('zip.code', "Select one or more zip codes: ", c(98020, 98026, 98028, 98047, 98056,
+                                                                                              98057, 98101, 98102, 98103, 98104,
+                                                                                              98105, 98106, 98107, 98108, 98109,
+                                                                                              98112, 98115, 98116, 98117, 98118,
+                                                                                              98119, 98121, 98122, 98125, 98126,
+                                                                                              98127, 98133, 98134, 98136, 98144,
+                                                                                              98146, 98154, 98155, 98161, 98166,
+                                                                                              98168, 98177, 98178, 98188, 98195,
+                                                                                              98199, 98346), selected = c(98020))
+                         ),
+                         mainPanel(
+                           tabsetPanel(
+                             tabPanel("Plot", plotOutput('location.plot', click = 'plot.click')),
+                             tabPanel("Table", tableOutput('location.table'))
+                           ),
+                           verbatimTextOutput("info"),
+                           verbatimTextOutput("map.info")
+                         )
+                       )
+                         
+               ),
              
              
              tabPanel ("Price",
@@ -128,14 +171,31 @@ my.ui <- fluidPage (
                        )),
              
              tabPanel ("Cuisine",
-                       titlePanel ("Title")
-                       #h2("What types of cuisines are more successful in Seattle?"),
-                       #sidebarLayout(
-                      #   radioButtons('visual',
-                       #             choices = c("Boxplot", "Table", "Cloud")),
-                        # selectInput('cuisine', 
-                         #            choices = cuisines)
-                       ),
+                       titlePanel(h3("Most Successful Cuisines")),
+                       sidebarLayout(
+                         sidebarPanel(
+                           p ("Question:"), h4 ("Which Types of Cuisines Are Most 
+                                                Successful in Seattle?"), hr (),
+                           actionButton('select.all', label = "Select All"),
+                           actionButton('deselect.all', label = "Deselect All"),
+                           checkboxGroupInput('cuisine',
+                                              label = h3("Cuisine"), 
+                                              choices = cuisines,
+                                              selected = cuisines[1])
+                         ),
+                         mainPanel(
+                           tabsetPanel(
+                             tabPanel ("Plot", plotOutput('cuisine.plot')),
+                             tabPanel ("Table", dataTableOutput('cuisine.table')),
+                             tabPanel ("Analysis", textOutput('cuisine.conclusion'))
+                           )
+                         )
+                       )
+             ),
+             
+             tabPanel("Review Ratings",
+                      tabPanel("Scatter", plotOutput('scatter'))
+             ),
              
              tabPanel ("Hours",
                        titlePanel ("Restaraunt Hours"),
