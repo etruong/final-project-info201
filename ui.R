@@ -8,19 +8,19 @@ library("shiny")
 source ("project.R")
 library ("DT")
 library ("plotly")
-
+library("lettercase")
 ########################
 ## SET UP FOR WIDGETS ##
 ########################
 
 library("shinyjs")
 
-yelp.data <- read.csv("data/zip-code-data.csv")
+yelp.data <- read.csv("data/zip-code-data.csv", stringsAsFactors = FALSE)
 
-cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
+cuisines <- str_cap_words(c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
               "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
-              "tradamerican", "vietnamese")
-
+              "tradamerican", "vietnamese"))
+yelp.data$category <- str_cap_words(yelp.data$category)
 prices <- c ("$", "$$", "$$$", "$$$$")
 zip.codes <- c("All Locations", "98101", "98102", "98103", "98104", "98105", "98106", "98107", "98108", "98109",
                "98111", "98112", "98113", "98114", "98115", "98116", "98117", "98118", "98119",
@@ -53,7 +53,7 @@ my.ui <- fluidPage (
                         tags$ul (class = "center", 
                                  tags$li (class = "index", "Location: Does restaraunt locations influence the rating?"), 
                                  tags$li (class = "index", em ("Opening/Closing Times:"), br(), "Is the opening and closing times of a restaraunt related to a restaraunt's success?"), 
-                                 tags$li (class = "index", "Cuisine: "),
+                                 tags$li (class = "index", "Cuisine: Which cuisines are most successful in Seattle?"),
                                  tags$li (class = "index", "Price:", br(), "Does food price determine a business' success rate?"))),
               
               tabPanel ("About", h2 ("About", class = "center"), 
@@ -147,15 +147,15 @@ my.ui <- fluidPage (
                            actionButton('deselect.all', label = "Deselect All"),
                            checkboxGroupInput('cuisine',
                                               label = h3("Cuisine"), 
-                                              choices = cuisines,
+                                              choices = str_cap_words(cuisines),
                                               selected = cuisines[1])
                          ),
                          mainPanel(
                            tabsetPanel(
                              tabPanel("Plot", plotOutput('plot')),
-                             tabPanel("Table", dataTableOutput('table'))
-                           ),
-                           textOutput('conclusion')
+                             tabPanel("Table", dataTableOutput('table')),
+                             tabPanel("Analysis", textOutput('conclusion'))
+                           )
                          )
                        )
              ),

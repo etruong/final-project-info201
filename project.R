@@ -10,7 +10,6 @@ library("ggplot2")
 library("httr")
 library("jsonlite")
 library("ggplot2")
-library("shiny")
 
 ###############
 #    CODE     #

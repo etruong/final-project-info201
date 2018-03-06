@@ -20,9 +20,10 @@ ratings <- unique (combine.data$rating) %>%
 # If there's time, we could also take a look at the correlation between the number of reviews and the rating
 
 yelp.data <- read.csv("data/zip-code-data.csv", stringsAsFactors = FALSE)
-cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
+cuisines <- str_cap_words(c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
               "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
-              "tradamerican", "vietnamese")
+              "tradamerican", "vietnamese"))
+yelp.data$category <- str_cap_words(yelp.data$category)
 yelp.data <- distinct(yelp.data, id, name, review_count, rating, price, 
                       phone, coordinates.latitude, coordinates.longitude, 
                       location.address1, location.city, location.zip_code, location.country, location.state, category)
@@ -159,7 +160,7 @@ my.server <- function (input, output, session) {
   
   output$table <- renderDataTable({
     curr.data <- na.omit(yelp.data %>%
-                           filter((category %in% input$cuisine)) %>%
+                           filter(category %in% input$cuisine) %>%
                            select(name, category, rating, review_count))
     summary <- curr.data %>%
       group_by(category) %>%
@@ -212,8 +213,9 @@ my.server <- function (input, output, session) {
   })
   
   output$scatter <- renderPlot({
-    scatter <- ggplot(data = yelp.data, aes(x = rating, y = review_count)) +
-      geom_point()
+    scatter <- ggplot(data = yelp.data, aes(x = rating, y = review_count, color = price)) +
+      geom_point() +
+      labs(title = "Review Count vs Rating", x = "Rating", y = "Review Count")
     return(scatter)
   })
     
