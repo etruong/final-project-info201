@@ -308,7 +308,9 @@ my.server <- function (input, output, session) {
     average.rate.min <- averages.rate[averages.rate.min.row, "location.zip_code"]
     
     # Prints out information about the zip code and average rating for it
-    
+    validate(
+    need(input.vector %in% !NA, sentence <- "Click on a zip code")
+    )
     sentence <- paste0("The selected zip code(s) is/are: ", 
                        averages.rate[,"location.zip_code"], " and the corresponding rating(s) is/are: ",
                        averages.rate[,"mean"],
