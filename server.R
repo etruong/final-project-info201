@@ -1,24 +1,16 @@
-library("knitr")
-library("dplyr")
-library("ggplot2")
-library("httr")
-library("jsonlite")
-library("ggplot2")
-library("shiny")
-# For capitalize function
+############
+## Set Up ##
+############
+
+# downloads all the packages required for application
 source ("project.R")
-library ("DT")
-library ("plotly")
-library(shiny)
 
-library("maps")
-library("tidyr")
-library(sp)
-library(maptools)
-library(rsconnect)
-
-combine.data <- read.csv ("data/combine-hour-zip-code-data.csv", stringsAsFactors = FALSE) 
-combine.data <- select (combine.data, id, name, rating, start, end, is.overnight, location.zip_code) %>%
+# reads and sets up the dataset to be used to display 
+# opening and closing times graph/information
+combine.data <- read.csv ("data/combine-hour-zip-code-data.csv", 
+                          stringsAsFactors = FALSE) 
+combine.data <- select (combine.data, id, name, rating, start, end, 
+                        is.overnight, location.zip_code) %>%
   mutate (start.n = round (start / 100), end.n = round (end / 100)) %>%
   select (id, name, rating, start.n, end.n, is.overnight, location.zip_code)
 ratings <- unique (combine.data$rating) %>%
@@ -26,39 +18,47 @@ ratings <- unique (combine.data$rating) %>%
 
 zip.code.data <- read.csv("data/zip-code-data.csv")
 
-# Only gets the data that has review counts greater than 100 for more reliable data
+# Only gets the data that has review counts greater than 100 for 
+# more reliable data
 zip.code.filtered <- filter(zip.code.data, review_count >= 100)
 
-# If there's time, we could also take a look at the correlation between the number of reviews and the rating
-
+# If there's time, we could also take a look at the correlation 
+# between the number of reviews and the rating
 yelp.data <- read.csv("data/zip-code-data.csv", stringsAsFactors = FALSE)
-cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
-              "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
+cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", 
+              "french", "german", "greek", "hawaiian", "italian", 
+              "japanese", "korean", "mediterranean", "mexican", 
+              "newamerican", "taiwanese", "thai", 
               "tradamerican", "vietnamese")
 yelp.data <- distinct(yelp.data, id, name, review_count, rating, price, 
                       phone, coordinates.latitude, coordinates.longitude, 
-                      location.address1, location.city, location.zip_code, location.country, location.state, category)
+                      location.address1, location.city, location.zip_code, 
+                      location.country, location.state, category)
 
 my.server <- function (input, output, session) {
-  
-  #############
-  ##  Elisa  ##
-  ############# 
-  
+
   data <- reactiveValues()
-  # Search Section
+  
+  ####################
+  ## Search Section ##
+  ####################
+  
+  # returns and outputs a searchable and interactive table of 
+  # the applications dataset
   output$output.all <- renderDT ({
     data <- read.csv ("data/zip-code-data.csv", stringsAsFactors = FALSE)
-    data <- select (data, name, rating, price, location.address1, location.zip_code, url)
+    data <- select (data, name, rating, price, location.address1, 
+                    location.zip_code, url)
     data <- unique (data)
     return (data)
   })
   
-  # Food Prices Section
-  # Questions: (1) when select and unselect by itself?
-  #            (2) how to validate if no data is returned
-  #            (3) if update options longer than other select all
+  #########################
+  ## Food Prices Section ##
+  #########################
   
+  # returns the yelp dataset with the information filtered according to
+  # the widgets in the food price section
   price.data <- reactive({
     data <- read.csv ("data/zip-code-data.csv", stringsAsFactors = FALSE)
     data <- select (data, id, name, rating, price, location.zip_code) %>%
@@ -69,32 +69,23 @@ my.server <- function (input, output, session) {
     }
     return (data)
   })
-  
-  # render UI function
-   observe ({
-     data <- price.data () %>%
-       filter (price == input$price)
-     ratings <- unique (data$rating) %>%
-       sort ()
-     updateCheckboxGroupInput (session, "rating", choices = ratings, selected = ratings)
-   })
    
-   output$price.rating.filter <- renderUI ({
-     
-   })
-   
-  # conditional panel
+  # returns a bar graph of the food price dataset with the
+  # specified preferences indicated
   output$price.plot <- renderPlot ({
     data <- price.data () %>%
       filter (price %in% input$price) %>%
       filter (rating %in% input$rating)
     
     price.graph <- ggplot (data) +
-      geom_bar (mapping = aes (x = price, fill = factor(rating)), position = "dodge") +
+      geom_bar (mapping = aes (x = price, fill = factor(rating)), 
+                position = "dodge") +
       scale_fill_brewer (type = "qual", palette = 8, name = "Rating")
     return (price.graph)
   })
   
+  # returns an interactive data table of the dataset for food
+  # prices filtered based on the user's filteration adjustments
   output$priced.restaraunts <- renderDT ({
     data <- price.data () %>%
       filter (price %in% input$price) %>%
@@ -103,7 +94,11 @@ my.server <- function (input, output, session) {
     return (data)
   })
   
-  # Hours Section
+  ###################
+  ## Hours Section ##
+  ###################
+  
+  # returns and outputs the interactive opening hours histogram
   output$open.hour.graph <- renderPlotly ({
     plot <- plot_ly(alpha = 0.6) 
     for (i in 1:length(ratings)) {
@@ -125,30 +120,31 @@ my.server <- function (input, output, session) {
     return (plot)
   })
   
+  # returns and outputs the interactive closing hours histogram
   output$close.hour.graph <- renderPlotly ({
     plot <- plot_ly(alpha = 0.6) 
     for (i in 1:length(ratings)) {
       test <- filter (combine.data, rating == ratings[i])
       plot <- plot %>% add_histogram (x = test$end.n, name = ratings[i])
     }
-    x <- list(
+    x <- list (
       title = "Closing Times (hr)",
       showticklabels = TRUE,
       ticks = "outside"
     )
-    y <- list(
+    y <- list (
       title = "Count",
       showticklabels = TRUE,
       ticks = "outside"
     )
     plot <- plot %>%
-      layout(barmode = "overlay", xaxis = x, yaxis = y)
+      layout (barmode = "overlay", xaxis = x, yaxis = y)
     return (plot)
   })
   
-  #############
-  ##  Tyler  ##
-  #############  
+  #####################
+  ## Cuisine Section ##
+  #####################
   
   observeEvent(input$select.all, {
     updateCheckboxGroupInput(session,
@@ -235,15 +231,19 @@ my.server <- function (input, output, session) {
     return(conclusion)
   })
   
+  ############################
+  ## Review Ratings Section ##
+  ############################
+  
   output$scatter <- renderPlot({
     scatter <- ggplot(data = yelp.data, aes(x = rating, y = review_count)) +
       geom_point()
     return(scatter)
   })
   
-  #############
-  ##  Itsumi ##
-  ############# 
+  ######################
+  ## Location Section ##
+  ######################
   
   table.data <- reactive({
     

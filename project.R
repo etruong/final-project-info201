@@ -11,6 +11,14 @@ library("httr")
 library("jsonlite")
 library("ggplot2")
 library("shiny")
+library("shinyjs")
+library ("DT")
+library ("plotly")
+library("maps")
+library("tidyr")
+library(sp)
+library(maptools)
+library(rsconnect)
 
 ###############
 #    CODE     #

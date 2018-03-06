@@ -1,20 +1,5 @@
-library("knitr")
-library("dplyr")
-library("ggplot2")
-library("httr")
-library("jsonlite")
-library("ggplot2")
-library("shiny")
 source ("project.R")
-library ("DT")
-library ("plotly")
-# install.packages("shinyjs")
-library("shinyjs")
-library("maps")
-library("tidyr")
-library(sp)
-library(maptools)
-library(rsconnect)
+
 
 ########################
 ## SET UP FOR WIDGETS ##
@@ -34,6 +19,7 @@ zip.codes <- c("All Locations", "98101", "98102", "98103", "98104", "98105", "98
                "98141", "98144", "98145", "98146", "98154", "98161", "98164", "98165",
                "98170", "98174", "98175", "98177", "98178", "98181", "98185",
                "98190", "98191", "98194", "98195", "98199")
+
 data <- read.csv ("data/zip-code-data.csv", stringsAsFactors = FALSE)
 data <- data %>%
   filter (is.na (price) != TRUE)
@@ -78,16 +64,16 @@ my.ui <- fluidPage (
                                            tags$li ("Elisa Truong"), tags$ul (tags$li ("Major: Intending HCDE or Design"), tags$li ("Year: 2nd"),
                                                                               tags$li ("Fun Fact: I love food, K-dramas and photography.")),
                                            tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
-                                                                                tags$li ("Interest")),
+                                                                                tags$li ("Fun Fact: I love soccer, kettle corn and lord of the rings")),
                                            tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended Informatics"), tags$li ("Year: 2nd"),
-                                                                                tags$li ("Interest")))
+                                                                                tags$li ("Fun Fact: I enjoy playing piano and skiing, and I still have a baby tooth")))
                         )),
               
               tabPanel ("Search", DTOutput ("output.all")),
               
              
               tabPanel ("Location",
-                       titlePanel(h3("Best and Worst Business Locations")),
+                       titlePanel("Best and Worst Business Locations"),
                        sidebarLayout(
                          sidebarPanel(
                            p ("Question:"), h4 ("Which locations are more likely for a business to fail?"), hr (),
@@ -125,17 +111,20 @@ my.ui <- fluidPage (
                            p ("Question:"), h4 ("Does food price determine a business' success rate?"), 
                            p ("Alter the graph (on right) with the widgets below."), hr (),
                            selectInput ("location", label = "Pick a zip code in the Seattle area to analyze:", choices = zip.codes),
-                           checkboxGroupInput ("rating", label = "Specify a rating to analyze:", choices = ratings, selected = ratings),
+                           checkboxGroupInput("rating", label = "Specify a rating to analyze:", choices = ratings, selected = ratings),
                            checkboxGroupInput ("price", label = "Choose a price to analyze:", choices = prices, selected = prices)
                          ),
                          
                          mainPanel (
                            
                            tabsetPanel (
-                             tabPanel ("Plot",
-                               h3 ("Food Prices Association with Restaraunt Ratings"),
+                             tabPanel ("Plot", conditionalPanel (
+                               condition = "nrow (price.data()) != 0",
+                               h3 ("Food Prices Association with Restaraunt Ratings"), 
+                               em ("Note: if the graph becomes grey this indicates we currently have no data
+                                   that match the preferences and zipcode specified"),
                                plotOutput ("price.plot")                
-                             ),
+                             )),
                              
                              tabPanel ("Observation Table", br(), DTOutput ("priced.restaraunts")),
                              
@@ -171,7 +160,7 @@ my.ui <- fluidPage (
                        )),
              
              tabPanel ("Cuisine",
-                       titlePanel(h3("Most Successful Cuisines")),
+                       titlePanel("Most Successful Cuisines"),
                        sidebarLayout(
                          sidebarPanel(
                            p ("Question:"), h4 ("Which Types of Cuisines Are Most 
@@ -260,7 +249,7 @@ my.ui <- fluidPage (
              ),
              
              tabPanel ("Conclusion", h2 ("Conclusion", class = "center"),
-                       p ("Blah, blah"))
+                       p (class = "center", "Our group faced several challenges"))
   )
 )
 
