@@ -3,13 +3,15 @@
 #################
 
 # Note: make sure you have access to the api key
-
-library("knitr")
-library("dplyr")
-library("ggplot2")
-library("httr")
-library("jsonlite")
-library("ggplot2")
+library("shiny")
+library("shinyjs")
+library ("DT")
+library ("plotly")
+library("maps")
+library("tidyr")
+library(sp)
+library(maptools)
+library(rsconnect)
 
 ###############
 #    CODE     #
@@ -22,9 +24,10 @@ GetContent <- function(resource, query.params) {
   base.uri <- "https://api.yelp.com/v3/"
   resource.uri <- paste0(base.uri, resource)
   access <- paste("Bearer", api.key)
-  response <- GET (resource.uri, add_headers(Authorization = access), 
+  response <- GET (resource.uri, add_headers(Authorization = access),
                    query = query.params)
   body <- content (response, "text")
   api.data <- fromJSON (body) 
   return (api.data)
+
 }
