@@ -23,9 +23,10 @@ GetContent <- function(resource, query.params) {
   base.uri <- "https://api.yelp.com/v3/"
   resource.uri <- paste0(base.uri, resource)
   access <- paste("Bearer", api.key)
-  response <- GET (resource.uri, add_headers(Authorization = access), 
+  response <- GET (resource.uri, add_headers(Authorization = access),
                    query = query.params)
   body <- content (response, "text")
   api.data <- fromJSON (body) 
   return (api.data)
+
 }
