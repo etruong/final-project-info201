@@ -37,15 +37,18 @@ my.ui <- fluidPage (
   navbarPage (p (id = "app-title", tags$img (src = "logo.svg", width = "20px", height = "20px"), "Food Success"),
           
               tabPanel ("Home", tags$div (id = "welcome-page",
-                        p (class = "center", tags$img (id = "main-logo", src = "logo.svg", width = "250px", height = "250px")), h1 ("Welcome!", class = "center"), 
-                        p (class = "center", "This application explores the Yelp Fusion API ( for more details ", a ("click here", href = "https://www.yelp.com/fusion"),
-                        ") to answer the question:"), p (id = "main-ques", class = "center", "What factors make a successful food business?"),
+                        p (class = "center",
+                           tags$img (id = "main-logo", src = "logo.svg", width = "250px", height = "250px")), 
+                        h1 ("Welcome!", class = "center"), 
+                        p (class = "center", "This application explores the Yelp Fusion API ( for more details ", 
+                           a ("click here", href = "https://www.yelp.com/fusion"), ") to answer the question:"), 
+                        p (id = "main-ques", class = "center", "What factors make a successful food business?"),
                         p (class = "center", "Start exploring this application by clicking the above tabs")), 
                         tags$div (id = "index-section",
                           h4 (class = "center", id = "index-title", "Index"),
-                          tags$ul (
-                                   tags$li (class = "index", "Location: Does restaraunt locations influence the rating?"), 
-                                   tags$li (class = "index", "Opening/Closing Times: Is the opening and closing times of a restaraunt related to a restaraunt's success?"), 
+                          tags$ul (tags$li (class = "index", "Location: Does restaraunt locations influence the rating?"), 
+                                   tags$li (class = "index", "Opening/Closing Times: Is the opening and closing times of a 
+                                            restaraunt related to a restaraunt's success?"), 
                                    tags$li (class = "index", "Cuisine: Which Types of Cuisines Are Most Successful in Seattle?"),
                                    tags$li (class = "index", "Price: Does food price determine a business' success rate?")))),
               
