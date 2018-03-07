@@ -18,6 +18,17 @@ ratings <- unique (combine.data$rating) %>%
 
 zip.code.data <- read.csv("data/zip-code-data.csv")
 
+# 
+ConvertNumToTime <- function (num) {
+  min <- ((num * 10) %% 10) / 10 * 60
+  min <- ceiling (min)
+  hour <- floor (num)
+  if (min < 10) {
+    min <- paste0("0", min)
+  }
+  return (paste0(hour, ":", min))
+}
+
 # Only gets the data that has review counts greater than 100 for 
 # more reliable data
 zip.code.filtered <- filter(zip.code.data, review_count >= 100)
@@ -92,6 +103,16 @@ my.server <- function (input, output, session) {
       filter (rating %in% input$rating) %>%
       select (name, rating, price)
     return (data)
+  })
+  
+  # returns and outputs a summary of the price data
+  output$price.summary <- renderTable ({
+    data <- price.data ()
+    summary.data <- group_by (data, price) %>%
+      summarise (average_rating = mean (rating), 
+                 standard_deviation = sd (rating),
+                 median_rating = median (rating))
+    return (summary.data)
   })
   
   ###################

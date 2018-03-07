@@ -1,5 +1,8 @@
 source ("project.R")
 
+# Cite source of data
+# Clear who target audience is
+# Make sure how you analyze
 
 ########################
 ## SET UP FOR WIDGETS ##
@@ -114,8 +117,11 @@ my.ui <- fluidPage (
                            p ("Question:"), h4 ("Does food price determine a business' success rate?"), 
                            p ("Alter the graph (on right) with the widgets below."), hr (),
                            selectInput ("location", label = "Pick a zip code in the Seattle area to analyze:", choices = zip.codes),
-                           checkboxGroupInput("rating", label = "Specify a rating to analyze:", choices = ratings, selected = ratings),
-                           checkboxGroupInput ("price", label = "Choose a price to analyze:", choices = prices, selected = prices)
+                           checkboxGroupInput("rating", label = p ("Specify a rating to analyze:", br (), "(5 is the highest rating)"), 
+                                              choices = ratings, selected = ratings),
+                           checkboxGroupInput ("price", label = "Choose a price to analyze:", choiceValues = prices, 
+                                               choiceNames = c ("$ (Cheap)", "$$ (Moderate)", "$$$ (Pricey)", "$$$$ (Ultra High-End)"),
+                                               selected = prices)
                          ),
                          
                          mainPanel (
@@ -124,10 +130,15 @@ my.ui <- fluidPage (
                              tabPanel ("Plot", conditionalPanel (
                                condition = "nrow (price.data()) != 0",
                                h3 ("Food Prices Association with Restaraunt Ratings"), 
-                               em ("Note: if the graph becomes grey this indicates we currently have no data
-                                   that match the preferences and zipcode specified"),
-                               plotOutput ("price.plot")                
+                               p ("The graph below plots the amount of restaraunts in Seattle
+                                  of a specific rating and price, the y-axis is the count or number of
+                                  restaraunts with the specific food price (x-axis). The colors depict
+                                  the restaraunt's rating.", em ("Note: if the graph becomes grey this indicates we currently have no data
+                                   that match the preferences and zipcode specified")),
+                               plotOutput ("price.plot")
                              )),
+                             
+                             tabPanel ("Summary", h3("Data Summary"), tableOutput ("price.summary")),
                              
                              tabPanel ("Observation Table", br(), DTOutput ("priced.restaraunts")),
                              
@@ -141,22 +152,30 @@ my.ui <- fluidPage (
                                            We defined success as the overall rating individuals gave a business where
                                            a rating of 5.0 indicates a very successful business."), 
                                         strong ("The Data"), 
-                                        p ("Analyzing the data for all locations (i.e. all locations in Seattle) support the idea that 
-                                           more expensive food prices do not equate to a successful businesses. While there is a larger
-                                           amount of data for low food priced restaraunts, low priced restaraunts seem to have
-                                           better ratings in comparison to more expensive restaraunts. The low priced restaraunts are the
-                                           only restaraunts recieving five star ratings. There are several additional observations we can also draw from this chart.
-                                           Restaraunts charging their customers more for food do not recieve any ratings lower than 3.5.
-                                           Also there are way more low priced ($ and $$) restaraunts in the Seattle area than there are expensive or high class
-                                           restaraunts. The data suggests, though we cannot draw conclusive information, that a more
-                                           successful business (operationally defined as the restaraunt's rating) in Seattle may be associated with lower food prices."), 
+                                        p ("Analyzing the data for all locations (i.e. all locations in Seattle) reveal that
+                                           restaraunt food prices are not a significant factor that determines whether a restaraunt
+                                           is successful. The average ratings for all different levels of restaraunt food prices were
+                                           around an average rating of 4.0 with the more expensive restaraunts attaining a higher rating
+                                           in comparison to the cheaper restaraunts on average by 0.09, and the lowest average ratings 
+                                           were restaraunts that were moderately priced ($$).
+
+                                           There are several additional observations we can also draw from this bar graph.
+                                           Restaraunts charging their customers more for food do not recieve any ratings lower than 3.0.
+                                           Also there are way more low priced ($ and $$) restaraunts in the Seattle area 
+                                           than there are expensive restaraunts."),
                                         strong ("Limitations"), 
-                                        p ("The data reveals several interesting aspects about the relationship between
-                                           food prices and ratings, but we cannot draw a causal relation for several reasons.
-                                           The sample sizes attained for each independent variable are not the same; it is
-                                           clear that there are more nonexpensive restaraunts than expensive restaraunts.
-                                           Thus, it is plausible that if we attain equal sample sizes that are randomly chosen
-                                           that the outcome of this data analysis would be different.")))),
+                                        p ("There are several limitations and possible reasons for the results that our group
+                                           attained. We did not conduct any statistical analysis, therefore we cannot conclusively
+                                           draw that the difference between the ratings of different restaraunt prices were
+                                           insignificant. Our group based it subjectively; in other words, if the averages had a 
+                                           different greater then one or more then the results are significant.
+                                           The sample size attained for each independent variable are not the same; it is
+                                           clear that there are more nonexpensive restaraunts than expensive restaraunts,
+                                           and the more expensive restaraunts have a less varied distribution (0.33) than
+                                           the least expensive restaraunts do (0.54) possible due to the fact expensive restaraunts
+                                           had a smaller sample size.
+                                           Thus, it is plausible that if we attain equal sample sizes the outcome of 
+                                           this data analysis would be different.")))),
                          position = "left",
                          fluid = TRUE
                          
@@ -200,12 +219,12 @@ my.ui <- fluidPage (
                          mainPanel (
                            tabsetPanel (
                              tabPanel ("Opening Hours", h3 ("Opening Hours and Restaraunt Ratings"),
-                                       p ("The graph reveals data on the number of restaraunts which opens at a specific time
+                                       p ("The graph reveals data on the number of restaraunts (counts) which opens at a specific time
                                           on average based on the ratings. Thus by interacting with the graph you can
                                           analyze the most common times that 5.0 rated or a specific rated restaraunts you are interested in
                                           are open.", em ("Note: The times are based on a 24 hour time format.")), plotlyOutput ("open.hour.graph")),
                              tabPanel ("Closing Hours", h3 ("Closing Hours and Restaraunt Ratings"), 
-                                       p ("The graph reveals data on the number of restaraunts which closes at a specific time
+                                       p ("The graph reveals data on the number of restaraunts (counts) which closes at a specific time
                                           on average based on the ratings. Thus by interacting with the graph you can
                                           analyze the most common times that 5.0 rated or a specific rated restaraunts you are interested in
                                           are closed.", em ("Note: The times are based on a 24 hour time format.")), plotlyOutput ("close.hour.graph")),
@@ -222,10 +241,10 @@ my.ui <- fluidPage (
                                           having a longer opening time may mean more money to gain during
                                           those hours or more importantly an opportunity for more people
                                           to visit the restaraunt."), strong ("The Data"),
-                                       p ("Overall, there does not seem like any significant relationship between opening and
+                                       p ("Overall, there is not a significant relationship between opening and
                                           closing times and ratings, but there is evidently common features that 
                                           higher rated restaraunts have. Higher rated restaraunts seem to on average
-                                          open later in the day (the evening) in comparison to lower rated restaraunts
+                                          open later in the day in comparison to lower rated restaraunts
                                           that open earlier. A likely explanation for this observation is that higher rated restaraunts
                                           because they are successful are able to afford opening later in the day while
                                           low rated restaraunts need to be open longer. This was one of the
@@ -255,5 +274,5 @@ my.ui <- fluidPage (
                        p (class = "center", "Our group faced several challenges"))
   )
 )
-
+?checkboxGroupInput
 shinyUI (my.ui)
