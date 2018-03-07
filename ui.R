@@ -293,7 +293,17 @@ my.ui <- fluidPage (
              ),
              
              tabPanel ("Conclusion", h2 ("Conclusion", class = "center"),
-                       p (class = "center", "Our group faced several challenges"))
+                       p (class = "center", "Our group faced several challenges")),
+             tabPanel ("Source",
+                       h2("Source", class = "center"),
+                       p("Our group used the ", a("Yelp API", href = "https://www.yelp.com/fusion"), "to obtain data from restaurants in the Seattle area. This was done by requesting
+                       data from Yelp multiple times until we had a sufficient sample size. Each call used a different Seattle zip
+                       code in order to access restaurants all across Seattle. All zip codes were included in each API requests. From
+                       there, we assigned each restaurant a cuisine based off the category section of the the data. From there, the 
+                       data was saved to a csv file and filtered for unique entries (some duplicate entries were present). The data
+                       used in the app is stored as a csv file and sourced each time the application is run. We chose to save 
+                       the data this way instead of requesting data from the API because we have a limited number of API 
+                       requests per day. Thus, we wanted to ensure that we would not go over the limit when running this application."))
   )
 )
 
