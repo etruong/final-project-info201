@@ -242,6 +242,7 @@ my.server <- function (input, output, session) {
   
   table.data <- reactive({
     
+    Sys.setlocale(locale="C")
     # Gets the data of the selected zip code and only show the name, rating and zip code in the table
     vector <- c(input$zip.code)
     zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% vector)
