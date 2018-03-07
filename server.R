@@ -28,6 +28,7 @@ yelp.data <- read.csv("data/zip-code-data.csv", stringsAsFactors = FALSE)
 cuisines <- str_cap_words(c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
               "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
               "tradamerican", "vietnamese"))
+
 yelp.data$category <- str_cap_words(yelp.data$category)
 
 yelp.data <- distinct(yelp.data, id, name, review_count, rating, price, 
@@ -41,6 +42,7 @@ my.server <- function (input, output, session) {
   cuisine.data$curr.data <- na.omit(yelp.data %>%
                                     filter(category %in% cuisines) %>%
                                     select(name, category, rating, review_count))
+
   
   ####################
   ## Search Section ##
@@ -72,7 +74,7 @@ my.server <- function (input, output, session) {
     }
     return (data)
   })
-   
+
   # returns a bar graph of the food price dataset with the
   # specified preferences indicated
   output$price.plot <- renderPlot ({
@@ -150,9 +152,11 @@ my.server <- function (input, output, session) {
   #####################
   
   observeEvent(input$cuisine, {
+
       cuisine.data$curr.data <- yelp.data %>%
                                 filter(category %in% input$cuisine) %>%
                                 select(name, category, rating, review_count)
+
   })
   
   observeEvent(input$select.all, {
@@ -288,28 +292,35 @@ my.server <- function (input, output, session) {
   # Creates a sentence about the average ratings for the selected zip codes
   output$info <- renderText({
     input.vector <- c(input$zip.code)
-    zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
-    averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
-      summarize(mean = round(mean(rating), digits = 3))
+    if(length(input.vector) == 0){
+      sentence <- paste0("Click on a zip code")
+    } else {
+      zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
+      averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
+        summarize(mean = round(mean(rating), digits = 3))
+      
+      # Finds the zip code that has the max and min averages
+      averages.rate.max.row <- which(averages.rate[,"mean"] == max(averages.rate[,"mean"]))
+      averages.rate.min.row <- which(averages.rate[,"mean"] == min(averages.rate[,"mean"]))
+      average.rate.max <- averages.rate[averages.rate.max.row, "location.zip_code"]
+      average.rate.min <- averages.rate[averages.rate.min.row, "location.zip_code"]
+      
+      # Prints out information about the zip code and average rating for it
+      validate(
+        need(length(input.vector) == 0, "Click on a zip code")
+      )
+      sentence <- paste0("The selected zip code(s) is/are: ", 
+                         averages.rate[,"location.zip_code"], " and the corresponding rating(s) is/are: ",
+                         averages.rate[,"mean"],
+                         ". The highest rating was ", average.rate.max, ", and the lowest rating was ", average.rate.min, 
+                         ". The lower the rating, the more likely the business will fail, so the business in, ", average.rate.min,
+                         " is most likely to fail out of the selected zip codes.")
+    }
     
-    # Finds the zip code that has the max and min averages
-    averages.rate.max.row <- which(averages.rate[,"mean"] == max(averages.rate[,"mean"]))
-    averages.rate.min.row <- which(averages.rate[,"mean"] == min(averages.rate[,"mean"]))
-    average.rate.max <- averages.rate[averages.rate.max.row, "location.zip_code"]
-    average.rate.min <- averages.rate[averages.rate.min.row, "location.zip_code"]
-    
-    # Prints out information about the zip code and average rating for it
-    
-    sentence <- paste0("The selected zip code(s) is/are: ", 
-                       averages.rate[,"location.zip_code"], " and the corresponding rating(s) is/are: ",
-                       averages.rate[,"mean"],
-                       ". The highest rating was ", average.rate.max, ", and the lowest rating was ", average.rate.min, 
-                       ". The lower the rating, the more likely the business will fail, so the business in, ", average.rate.min,
-                       " is most likely to fail out of the selected zip codes.")
     
     return(sentence)
   })
-    
+
 }
 
 shinyServer (my.server)
