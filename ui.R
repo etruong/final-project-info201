@@ -219,16 +219,15 @@ my.ui <- fluidPage (
                          mainPanel (
                            tabsetPanel (
                              tabPanel ("Opening Hours", h3 ("Opening Hours and Restaraunt Ratings"),
-                                       p ("The graph reveals data on the number of restaraunts which opens at a specific time
+                                       p ("The graph reveals data on the number of restaraunts (counts) which opens at a specific time
                                           on average based on the ratings. Thus by interacting with the graph you can
                                           analyze the most common times that 5.0 rated or a specific rated restaraunts you are interested in
                                           are open.", em ("Note: The times are based on a 24 hour time format.")), plotlyOutput ("open.hour.graph")),
                              tabPanel ("Closing Hours", h3 ("Closing Hours and Restaraunt Ratings"), 
-                                       p ("The graph reveals data on the number of restaraunts which closes at a specific time
+                                       p ("The graph reveals data on the number of restaraunts (counts) which closes at a specific time
                                           on average based on the ratings. Thus by interacting with the graph you can
                                           analyze the most common times that 5.0 rated or a specific rated restaraunts you are interested in
                                           are closed.", em ("Note: The times are based on a 24 hour time format.")), plotlyOutput ("close.hour.graph")),
-                             tabPanel ("Overall Summary", tableOutput ("hour.summary")),
                              tabPanel ("Analysis", h3 ("Analysis"), strong ("Background Information"),
                                        p ("In this section, we analyzed whether opening or closing times
                                           were related to the restaraunt's success. A successful business

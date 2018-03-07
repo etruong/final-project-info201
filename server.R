@@ -163,19 +163,6 @@ my.server <- function (input, output, session) {
     return (plot)
   })
   
-  # returns and outputs the a summary table of the hours section data
-  output$hour.summary <- renderTable ({
-    hour.summary <- group_by (combine.data, rating) %>%
-      summarise (average_opening = mean (start.n), average_closing = mean(end.n),
-                 sd_opening = sd (start.n), sd_closing = sd (end.n))
-    hour.summary <- mutate (hour.summary, avg_open = ConvertNumToTime(average_opening),
-                            avg_close = ConvertNumToTime(average_closing)) %>%
-      select (rating, avg_open, avg_close, sd_opening, sd_closing)
-    label <- c ("Rating", "Average Opening", "Average Closing", "Opening SD", "Closing SD")
-    colnames (hour.summary) <- label
-    return (hour.summary)
-  })
-  
   #####################
   ## Cuisine Section ##
   #####################
