@@ -6,8 +6,6 @@ library("lettercase")
 ########################
 ## SET UP FOR WIDGETS ##
 ########################
-
-<<<<<<< HEAD
 library("shinyjs")
 
 yelp.data <- read.csv("data/zip-code-data.csv", stringsAsFactors = FALSE)
@@ -27,6 +25,10 @@ zip.codes <- c("All Locations", "98101", "98102", "98103", "98104", "98105", "98
                "98190", "98191", "98194", "98195", "98199")
 
 data <- read.csv ("data/zip-code-data.csv", stringsAsFactors = FALSE)
+data <- distinct(yelp.data, id, name, review_count, rating, price, 
+                      phone, coordinates.latitude, coordinates.longitude, 
+                      location.address1, location.city, location.zip_code, 
+                      location.country, location.state, category)
 data <- data %>%
   filter (is.na (price) != TRUE)
 ratings <- unique (data$rating)
@@ -63,6 +65,14 @@ my.ui <- fluidPage (
                            As a group, we were challenged to create our own application that would answer several critical questions
                            about a specific dataset. The API of our choosing was the Yelp Fusion API because the dataset provided
                            interesting data about food."),
+                        h3("Why", class = "center"),
+                        p(class = "center", "At first we wanted to look at which restaurants are good, so we could recommend consumers 
+                          restaurants to try. But as we explored the dataset, we found a lot more information that we could analyze 
+                          to determine elements of successful businesses."),
+                        h3("Who", class = "center"),
+                        p(class = "center", "We believe business owners can use the information from our questions to aid their decision making 
+                          when choosing to start a restaurant. They can read about our questions and conclusions, but also filter 
+                          for data they are interested in to draw their own conclusions."),
                         h3 ("The Team", class = "center divider"),
                         tags$div (id = "about-section", 
                                   tags$div (id = "about-img", tags$img (class = "img-icon", src = "elisa.jpg"),
@@ -177,21 +187,47 @@ my.ui <- fluidPage (
                            actionButton('deselect.all', label = "Deselect All"),
                            checkboxGroupInput('cuisine',
                                               label = h3("Cuisine"), 
-                                              choices = str_cap_words(cuisines),
-                                              selected = cuisines[1])
+                                              choices = cuisines,
+                                              selected = cuisines)
                          ),
                          mainPanel(
                            tabsetPanel(
                              tabPanel ("Plot", plotOutput('cuisine.plot')),
                              tabPanel ("Table", dataTableOutput('cuisine.table')),
-                             tabPanel ("Analysis", textOutput('cuisine.conclusion'))
+                             tabPanel ("Analysis",
+                                       h3("Analysis"),
+                                       strong("The Data"), 
+                                       p( "The restaurants were rated on a scale of 1 of 5 stars, where 1 star is the worst and 
+                                          5 stars is the best.A total of 581 restaurants were included in this analysis. 
+                                          From these, 577 were included in the final result. The 4 restaurants were removed were 
+                                          considered outliers because their rating was greater than 3 standard deviations above or 
+                                          below the mean of their respective categories. The main metrics examiend are the mean
+                                          ratings of the cuisines and the variance in ratings (the spread of the data)."),
+                                       strong("The Numbers"),
+                                       textOutput('cuisine.conclusion'),
+                                       p(),
+                                       strong("Conclusion"),
+                                       p("Overall if one is looking to open a restaurant, French cuisines tend to fare better in 
+                                         terms of consistency. However, from a raw average rating standpoint, Caribbean
+                                         restaurants are highly rated, so one could make an argument that these restaurants
+                                         are most successful. Thus, Caribbean and French cuisines are slightly more successful
+                                         in the Seattle are."),
+                                       p("Cajun food, on the other hand, tend to fare worse than Caribben and French food. They
+                                         are rated rather low on average. Vietnamese food, though relatively highly rated, has
+                                         high variance in ratings. Thus, when looking to start a business, one should consider
+                                         the variance in ratings. There are a few possible reasons for high variance, one of 
+                                         which would be the varying expectations of restaurants. This could be linked to the
+                                         area in which the restaurant is, such as the competitiveness for the cuisine in an area
+                                         or the average expectation level of a customer."),
+                                       p("From the types of cuisines and data analyzed, we can conclude that although there is not a 
+                                         significant correlation between the cuisine and the rating, there are some cuisines that 
+                                         tend to fare better than others. Although there is no one cuisine that is definitively 
+                                         better, there are some that are more successful in the Seattle area, and thus should have 
+                                         influence in one's decision of starting a business.")
+                             )
                            )
                          )
                        )
-             ),
-             
-             tabPanel("Review Ratings",
-                      tabPanel("Scatter", plotOutput('scatter'))
              ),
              
              tabPanel ("Hours",

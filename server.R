@@ -37,7 +37,10 @@ yelp.data <- distinct(yelp.data, id, name, review_count, rating, price,
 
 my.server <- function (input, output, session) {
 
-  data <- reactiveValues()
+  cuisine.data <- reactiveValues()
+  cuisine.data$curr.data <- na.omit(yelp.data %>%
+                                    filter(category %in% cuisines) %>%
+                                    select(name, category, rating, review_count))
   
   ####################
   ## Search Section ##
@@ -146,12 +149,21 @@ my.server <- function (input, output, session) {
   ## Cuisine Section ##
   #####################
   
+  observeEvent(input$cuisine, {
+      cuisine.data$curr.data <- yelp.data %>%
+                                filter(category %in% input$cuisine) %>%
+                                select(name, category, rating, review_count)
+  })
+  
   observeEvent(input$select.all, {
     updateCheckboxGroupInput(session,
                              'cuisine',
                              label = "Cuisine", 
                              choices = cuisines,
                              selected = cuisines)
+    cuisine.data$curr.data <- yelp.data %>%
+      filter(category %in% input$cuisine) %>%
+      select(name, category, rating, review_count)
   })
   
   observeEvent(input$deselect.all, {
@@ -160,13 +172,14 @@ my.server <- function (input, output, session) {
                              label = "Cuisine", 
                              choices = cuisines,
                              selected = c())
+    
+    cuisine.data$curr.data <- yelp.data %>%
+      filter(category %in% input$cuisine) %>%
+      select(name, category, rating, review_count)
   })
   
   output$cuisine.plot <- renderPlot({
-    curr.data <- na.omit(yelp.data %>%
-                           filter(category %in% input$cuisine) %>%
-                           select(name, category, rating, review_count))
-    grouped.data <- curr.data %>%
+    grouped.data <- cuisine.data$curr.data %>%
       group_by(category) %>%
       filter((rating > mean(rating) - 3 * sd(rating)) & (rating < mean(rating) + 3 * sd(rating)))
     plot <- ggplot(data = grouped.data, aes(x = category, y = rating, fill = category)) +
@@ -178,10 +191,7 @@ my.server <- function (input, output, session) {
   })
   
   output$cuisine.table <- renderDataTable({
-    curr.data <- na.omit(yelp.data %>%
-                           filter(category %in% input$cuisine) %>%
-                           select(name, category, rating, review_count))
-    summary <- curr.data %>%
+    summary <- cuisine.data$curr.data %>%
       group_by(category) %>%
       summarise(max = round(max(rating), 2), min = round(min(rating), 2), mean = round(mean(rating), 2), 
                 median = round(median(rating), 2), std.dev = round(sd(rating), 2), variance = round(var(rating), 2), 
@@ -191,20 +201,14 @@ my.server <- function (input, output, session) {
   })
   
   output$cuisine.conclusion <- renderText({
-    curr.data <- na.omit(yelp.data %>%
-                           filter(review_count >= 100 & category %in% cuisines) %>%
-                           select(name, category, rating, review_count))
-    summary <- curr.data %>%
+    summary <- cuisine.data$curr.data %>%
       group_by(category) %>%
       summarise(max = round(max(rating), 2), min = round(min(rating), 2), mean = round(mean(rating), 2), 
                 median = round(median(rating), 2), std.dev = round(sd(rating), 2), variance = round(var(rating), 2), 
                 range = max(rating) - min(rating))
-    # View(summary)
     min.mean <- min(summary$mean)
     max.mean <- max(summary$mean)
     min.mean.cat <- summary[summary$mean == min.mean, ][1, 1]
-    # min.mean.cat <- filter(summary, mean == min.mean) %>%
-    #   select(category)
     max.mean.cat <- summary[summary$mean == max.mean, 1]
     
     min.range <- min(summary$range)
@@ -216,30 +220,16 @@ my.server <- function (input, output, session) {
     max.var <- max(summary$variance)
     min.var.cat <- summary[summary$variance == min.var, 1]
     max.var.cat <- summary[summary$variance == max.var, 1]
-    conclusion <- paste0("A total of 581 restaurants were included in this analysis. From these, 577 were included in
-                         the final result. The 4 restaurants were removed were considered outliers because their rating
-                         was greater than 3 standard deviations above or below the mean.
-                         From the types of cuisines and data analyzed, we can conclude that although there is not a significant
-                         correlation between the cuisine and the rating, there are some cuisines that tend to fare better than others.
-                         From an average rating metric, the values range from, ", min.mean, " to ", max.mean, ". With respect to the
+    conclusion <- paste0("From an average rating metric, the values range from, ", min.mean, " to ", max.mean, ". With respect to the
                          gathered data, ", max.mean.cat, " food is highly rated on average, while ", min.mean.cat, " food is
                          lowly rated on average.
                          With respect to range, ", max.range.cat, " restaurants had the highest range in their
-                         ratings (", max.range, "), while ",  min.range.cat, " and ", min.range.cat, " cuisines had
+                         ratings (", max.range, "), while ",  min.range.cat[1, 1], " and ", min.range.cat[2, 1], " cuisines had
                          less range (", min.range, "). With respect to variance, ", max.var.cat, " restaurants had the highest
-                         variance (", max.var,"), while, ", min.var.cat," cuisines had the lowest variance (", min.var, ").")
+                         variance (", max.var,"), while, ", min.var.cat," cuisines had the lowest variance (", min.var, ").
+                         A reason for the large variance in ", max.var.cat, " is can be attributed to the wide spread of values
+                         the ratings take.")
     return(conclusion)
-  })
-  
-  ############################
-  ## Review Ratings Section ##
-  ############################
-  
-  output$scatter <- renderPlot({
-    scatter <- ggplot(data = yelp.data, aes(x = rating, y = review_count, color = price)) +
-      geom_point() +
-      labs(title = "Review Count vs Rating", x = "Rating", y = "Review Count")
-    return(scatter)
   })
   
   ######################
