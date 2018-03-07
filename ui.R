@@ -311,7 +311,15 @@ my.ui <- fluidPage (
                                         ),
               
               tabPanel ("Conclusion", h2 ("Conclusion", class = "center"),
-                        p (class = "center", "Our group faced several challenges"))
+                        p (class = "center", "Our group faced several challenges"),
+                        mainPanel("   The main overarching question that was being answered was \"What factors make a 
+                                  successful food business?\". There were 4 questions that stemed off from this question which
+                                  led to a conclusion for the main question. All of the data we looked at had no signficant correlation
+                                  but we were able to draw some points that supports the answer to the main question. We concluded that
+                                  a more successful business in Seattle may be associated with lower food prices, Caribbean or French cuisines,
+                                  and opens later in the day. The zip code of a location has no correlation between if a business will fail or succeed.
+                                  Even though there are small relationships, there are no major correlations that will fully help answer
+                                  the question of what factors make a successful food business based on our data of Seattle. "))
                               )
                               )
 
