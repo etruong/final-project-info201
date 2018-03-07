@@ -12,6 +12,8 @@ library("tidyr")
 library(sp)
 library(maptools)
 library(rsconnect)
+library("lettercase")
+library("dplyr")
 
 ###############
 #    CODE     #

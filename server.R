@@ -99,6 +99,16 @@ my.server <- function (input, output, session) {
     return (data)
   })
   
+  # returns and outputs a summary of the price data
+  output$price.summary <- renderTable ({
+    data <- price.data ()
+    summary.data <- group_by (data, price) %>%
+      summarise (average_rating = mean (rating), 
+                 standard_deviation = sd (rating),
+                 median_rating = median (rating))
+    return (summary.data)
+  })
+  
   ###################
   ## Hours Section ##
   ###################
@@ -242,6 +252,7 @@ my.server <- function (input, output, session) {
   
   table.data <- reactive({
     
+    Sys.setlocale(locale="C")
     # Gets the data of the selected zip code and only show the name, rating and zip code in the table
     vector <- c(input$zip.code)
     zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% vector)
@@ -267,7 +278,7 @@ my.server <- function (input, output, session) {
     # Gets the average rating for each of the selected input
     zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
     averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
-      summarize(mean = mean(rating))
+      summarise(mean = mean(rating))
     
     
     # Makes the zip code and mean value from above into a vector
@@ -297,7 +308,7 @@ my.server <- function (input, output, session) {
     } else {
       zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
       averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
-        summarize(mean = round(mean(rating), digits = 3))
+        summarise(mean = round(mean(rating), digits = 3))
       
       # Finds the zip code that has the max and min averages
       averages.rate.max.row <- which(averages.rate[,"mean"] == max(averages.rate[,"mean"]))
