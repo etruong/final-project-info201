@@ -18,6 +18,17 @@ ratings <- unique (combine.data$rating) %>%
 
 zip.code.data <- read.csv("data/zip-code-data.csv")
 
+# 
+ConvertNumToTime <- function (num) {
+  min <- ((num * 10) %% 10) / 10 * 60
+  min <- ceiling (min)
+  hour <- floor (num)
+  if (min < 10) {
+    min <- paste0("0", min)
+  }
+  return (paste0(hour, ":", min))
+}
+
 # Only gets the data that has review counts greater than 100 for 
 # more reliable data
 zip.code.filtered <- filter(zip.code.data, review_count >= 100)
@@ -94,6 +105,16 @@ my.server <- function (input, output, session) {
     return (data)
   })
   
+  # returns and outputs a summary of the price data
+  output$price.summary <- renderTable ({
+    data <- price.data ()
+    summary.data <- group_by (data, price) %>%
+      summarise (average_rating = mean (rating), 
+                 standard_deviation = sd (rating),
+                 median_rating = median (rating))
+    return (summary.data)
+  })
+  
   ###################
   ## Hours Section ##
   ###################
@@ -140,6 +161,19 @@ my.server <- function (input, output, session) {
     plot <- plot %>%
       layout (barmode = "overlay", xaxis = x, yaxis = y)
     return (plot)
+  })
+  
+  # returns and outputs the a summary table of the hours section data
+  output$hour.summary <- renderTable ({
+    hour.summary <- group_by (combine.data, rating) %>%
+      summarise (average_opening = mean (start.n), average_closing = mean(end.n),
+                 sd_opening = sd (start.n), sd_closing = sd (end.n))
+    hour.summary <- mutate (hour.summary, avg_open = ConvertNumToTime(average_opening),
+                            avg_close = ConvertNumToTime(average_closing)) %>%
+      select (rating, avg_open, avg_close, sd_opening, sd_closing)
+    label <- c ("Rating", "Average Opening", "Average Closing", "Opening SD", "Closing SD")
+    colnames (hour.summary) <- label
+    return (hour.summary)
   })
   
   #####################
@@ -321,4 +355,5 @@ my.server <- function (input, output, session) {
     
 }
 
+?mode
 shinyServer (my.server)
