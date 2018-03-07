@@ -3,13 +3,6 @@
 #################
 
 # Note: make sure you have access to the api key
-
-library("knitr")
-library("dplyr")
-library("ggplot2")
-library("httr")
-library("jsonlite")
-library("ggplot2")
 library("shiny")
 library("shinyjs")
 library ("DT")
@@ -19,6 +12,8 @@ library("tidyr")
 library(sp)
 library(maptools)
 library(rsconnect)
+library("lettercase")
+library("dplyr")
 
 ###############
 #    CODE     #

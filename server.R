@@ -18,17 +18,6 @@ ratings <- unique (combine.data$rating) %>%
 
 zip.code.data <- read.csv("data/zip-code-data.csv")
 
-# 
-ConvertNumToTime <- function (num) {
-  min <- ((num * 10) %% 10) / 10 * 60
-  min <- ceiling (min)
-  hour <- floor (num)
-  if (min < 10) {
-    min <- paste0("0", min)
-  }
-  return (paste0(hour, ":", min))
-}
-
 # Only gets the data that has review counts greater than 100 for 
 # more reliable data
 zip.code.filtered <- filter(zip.code.data, review_count >= 100)
@@ -36,11 +25,12 @@ zip.code.filtered <- filter(zip.code.data, review_count >= 100)
 # If there's time, we could also take a look at the correlation 
 # between the number of reviews and the rating
 yelp.data <- read.csv("data/zip-code-data.csv", stringsAsFactors = FALSE)
-cuisines <- c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", 
-              "french", "german", "greek", "hawaiian", "italian", 
-              "japanese", "korean", "mediterranean", "mexican", 
-              "newamerican", "taiwanese", "thai", 
-              "tradamerican", "vietnamese")
+cuisines <- str_cap_words(c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
+              "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
+              "tradamerican", "vietnamese"))
+
+yelp.data$category <- str_cap_words(yelp.data$category)
+
 yelp.data <- distinct(yelp.data, id, name, review_count, rating, price, 
                       phone, coordinates.latitude, coordinates.longitude, 
                       location.address1, location.city, location.zip_code, 
@@ -48,7 +38,11 @@ yelp.data <- distinct(yelp.data, id, name, review_count, rating, price,
 
 my.server <- function (input, output, session) {
 
-  data <- reactiveValues()
+  cuisine.data <- reactiveValues()
+  cuisine.data$curr.data <- na.omit(yelp.data %>%
+                                    filter(category %in% cuisines) %>%
+                                    select(name, category, rating, review_count))
+
   
   ####################
   ## Search Section ##
@@ -80,7 +74,7 @@ my.server <- function (input, output, session) {
     }
     return (data)
   })
-   
+
   # returns a bar graph of the food price dataset with the
   # specified preferences indicated
   output$price.plot <- renderPlot ({
@@ -167,12 +161,23 @@ my.server <- function (input, output, session) {
   ## Cuisine Section ##
   #####################
   
+  observeEvent(input$cuisine, {
+
+      cuisine.data$curr.data <- yelp.data %>%
+                                filter(category %in% input$cuisine) %>%
+                                select(name, category, rating, review_count)
+
+  })
+  
   observeEvent(input$select.all, {
     updateCheckboxGroupInput(session,
                              'cuisine',
                              label = "Cuisine", 
                              choices = cuisines,
                              selected = cuisines)
+    cuisine.data$curr.data <- yelp.data %>%
+      filter(category %in% input$cuisine) %>%
+      select(name, category, rating, review_count)
   })
   
   observeEvent(input$deselect.all, {
@@ -181,13 +186,14 @@ my.server <- function (input, output, session) {
                              label = "Cuisine", 
                              choices = cuisines,
                              selected = c())
+    
+    cuisine.data$curr.data <- yelp.data %>%
+      filter(category %in% input$cuisine) %>%
+      select(name, category, rating, review_count)
   })
   
   output$cuisine.plot <- renderPlot({
-    curr.data <- na.omit(yelp.data %>%
-                           filter(category %in% input$cuisine) %>%
-                           select(name, category, rating, review_count))
-    grouped.data <- curr.data %>%
+    grouped.data <- cuisine.data$curr.data %>%
       group_by(category) %>%
       filter((rating > mean(rating) - 3 * sd(rating)) & (rating < mean(rating) + 3 * sd(rating)))
     plot <- ggplot(data = grouped.data, aes(x = category, y = rating, fill = category)) +
@@ -199,10 +205,7 @@ my.server <- function (input, output, session) {
   })
   
   output$cuisine.table <- renderDataTable({
-    curr.data <- na.omit(yelp.data %>%
-                           filter((category %in% input$cuisine)) %>%
-                           select(name, category, rating, review_count))
-    summary <- curr.data %>%
+    summary <- cuisine.data$curr.data %>%
       group_by(category) %>%
       summarise(max = round(max(rating), 2), min = round(min(rating), 2), mean = round(mean(rating), 2), 
                 median = round(median(rating), 2), std.dev = round(sd(rating), 2), variance = round(var(rating), 2), 
@@ -212,20 +215,14 @@ my.server <- function (input, output, session) {
   })
   
   output$cuisine.conclusion <- renderText({
-    curr.data <- na.omit(yelp.data %>%
-                           filter(review_count >= 100 & category %in% cuisines) %>%
-                           select(name, category, rating, review_count))
-    summary <- curr.data %>%
+    summary <- cuisine.data$curr.data %>%
       group_by(category) %>%
       summarise(max = round(max(rating), 2), min = round(min(rating), 2), mean = round(mean(rating), 2), 
                 median = round(median(rating), 2), std.dev = round(sd(rating), 2), variance = round(var(rating), 2), 
                 range = max(rating) - min(rating))
-    # View(summary)
     min.mean <- min(summary$mean)
     max.mean <- max(summary$mean)
     min.mean.cat <- summary[summary$mean == min.mean, ][1, 1]
-    # min.mean.cat <- filter(summary, mean == min.mean) %>%
-    #   select(category)
     max.mean.cat <- summary[summary$mean == max.mean, 1]
     
     min.range <- min(summary$range)
@@ -237,29 +234,16 @@ my.server <- function (input, output, session) {
     max.var <- max(summary$variance)
     min.var.cat <- summary[summary$variance == min.var, 1]
     max.var.cat <- summary[summary$variance == max.var, 1]
-    conclusion <- paste0("A total of 581 restaurants were included in this analysis. From these, 577 were included in
-                         the final result. The 4 restaurants were removed were considered outliers because their rating
-                         was greater than 3 standard deviations above or below the mean.
-                         From the types of cuisines and data analyzed, we can conclude that although there is not a significant
-                         correlation between the cuisine and the rating, there are some cuisines that tend to fare better than others.
-                         From an average rating metric, the values range from, ", min.mean, " to ", max.mean, ". With respect to the
+    conclusion <- paste0("From an average rating metric, the values range from, ", min.mean, " to ", max.mean, ". With respect to the
                          gathered data, ", max.mean.cat, " food is highly rated on average, while ", min.mean.cat, " food is
                          lowly rated on average.
                          With respect to range, ", max.range.cat, " restaurants had the highest range in their
-                         ratings (", max.range, "), while ",  min.range.cat, " and ", min.range.cat, " cuisines had
+                         ratings (", max.range, "), while ",  min.range.cat[1, 1], " and ", min.range.cat[2, 1], " cuisines had
                          less range (", min.range, "). With respect to variance, ", max.var.cat, " restaurants had the highest
-                         variance (", max.var,"), while, ", min.var.cat," cuisines had the lowest variance (", min.var, ").")
+                         variance (", max.var,"), while, ", min.var.cat," cuisines had the lowest variance (", min.var, ").
+                         A reason for the large variance in ", max.var.cat, " is can be attributed to the wide spread of values
+                         the ratings take.")
     return(conclusion)
-  })
-  
-  ############################
-  ## Review Ratings Section ##
-  ############################
-  
-  output$scatter <- renderPlot({
-    scatter <- ggplot(data = yelp.data, aes(x = rating, y = review_count)) +
-      geom_point()
-    return(scatter)
   })
   
   ######################
@@ -268,6 +252,7 @@ my.server <- function (input, output, session) {
   
   table.data <- reactive({
     
+    Sys.setlocale(locale="C")
     # Gets the data of the selected zip code and only show the name, rating and zip code in the table
     vector <- c(input$zip.code)
     zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% vector)
@@ -293,7 +278,7 @@ my.server <- function (input, output, session) {
     # Gets the average rating for each of the selected input
     zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
     averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
-      summarize(mean = mean(rating))
+      summarise(mean = mean(rating))
     
     
     # Makes the zip code and mean value from above into a vector
@@ -318,28 +303,35 @@ my.server <- function (input, output, session) {
   # Creates a sentence about the average ratings for the selected zip codes
   output$info <- renderText({
     input.vector <- c(input$zip.code)
-    zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
-    averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
-      summarize(mean = round(mean(rating), digits = 3))
+    if(length(input.vector) == 0){
+      sentence <- paste0("Click on a zip code")
+    } else {
+      zip.rate.data <- filter(zip.code.filtered, location.zip_code %in% input.vector)
+      averages.rate <- group_by(zip.rate.data, location.zip_code) %>%
+        summarise(mean = round(mean(rating), digits = 3))
+      
+      # Finds the zip code that has the max and min averages
+      averages.rate.max.row <- which(averages.rate[,"mean"] == max(averages.rate[,"mean"]))
+      averages.rate.min.row <- which(averages.rate[,"mean"] == min(averages.rate[,"mean"]))
+      average.rate.max <- averages.rate[averages.rate.max.row, "location.zip_code"]
+      average.rate.min <- averages.rate[averages.rate.min.row, "location.zip_code"]
+      
+      # Prints out information about the zip code and average rating for it
+      validate(
+        need(length(input.vector) == 0, "Click on a zip code")
+      )
+      sentence <- paste0("The selected zip code(s) is/are: ", 
+                         averages.rate[,"location.zip_code"], " and the corresponding rating(s) is/are: ",
+                         averages.rate[,"mean"],
+                         ". The highest rating was ", average.rate.max, ", and the lowest rating was ", average.rate.min, 
+                         ". The lower the rating, the more likely the business will fail, so the business in, ", average.rate.min,
+                         " is most likely to fail out of the selected zip codes.")
+    }
     
-    # Finds the zip code that has the max and min averages
-    averages.rate.max.row <- which(averages.rate[,"mean"] == max(averages.rate[,"mean"]))
-    averages.rate.min.row <- which(averages.rate[,"mean"] == min(averages.rate[,"mean"]))
-    average.rate.max <- averages.rate[averages.rate.max.row, "location.zip_code"]
-    average.rate.min <- averages.rate[averages.rate.min.row, "location.zip_code"]
-    
-    # Prints out information about the zip code and average rating for it
-    
-    sentence <- paste0("The selected zip code(s) is/are: ", 
-                       averages.rate[,"location.zip_code"], " and the corresponding rating(s) is/are: ",
-                       averages.rate[,"mean"],
-                       ". The highest rating was ", average.rate.max, ", and the lowest rating was ", average.rate.min, 
-                       ". The lower the rating, the more likely the business will fail, so the business in, ", average.rate.min,
-                       " is most likely to fail out of the selected zip codes.")
     
     return(sentence)
   })
-    
+
 }
 
 shinyServer (my.server)
