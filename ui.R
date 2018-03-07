@@ -66,7 +66,7 @@ my.ui <- fluidPage (
                                   tags$ul (id = "about-info",
                                            tags$li ("Elisa Truong"), tags$ul (tags$li ("Major: Intending HCDE or Design"), tags$li ("Year: 2nd"),
                                                                               tags$li ("Fun Fact: I love food, K-dramas and photography.")),
-                                           tags$li ("Itsumi Niiyama"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
+                                           tags$li ("Itsumi Niiyake"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
                                                                                 tags$li ("Fun Fact: I love soccer, kettle corn and lord of the rings")),
                                            tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended Informatics"), tags$li ("Year: 2nd"),
                                                                                 tags$li ("Fun Fact: I enjoy playing piano and skiing, and I still have a baby tooth")))
@@ -94,19 +94,7 @@ my.ui <- fluidPage (
                          mainPanel(
                            tabsetPanel(
                              tabPanel("Plot", plotOutput('location.plot', click = 'plot.click')),
-                             tabPanel("Table", tableOutput('location.table')),
-                             tabPanel("Analysis",
-                                      "Looking at the relationship between the zip code of a business and
-                                      its average rating provides information on whether the location of
-                                      a business will affect the success of it. An assumption was made that the
-                                      rating of a restaurant will affect the success of it because if a business has 
-                                      bad ratings, customers will not go there leading to the failure of a business. 
-                                      A bar graph was chosen to show the relationship between the rating and zip code
-                                      because this allows users to easily visualize a relationship between them. However,
-                                      from this data of zip codes in Seattle, it can be seen that the the average ratings
-                                      all very close. This means that the zip code does not have a noticable effect on the ratings 
-                                      of a business."
-                                       )
+                             tabPanel("Table", tableOutput('location.table'))
                            ),
                            verbatimTextOutput("info"),
                            verbatimTextOutput("map.info")
