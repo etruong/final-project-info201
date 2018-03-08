@@ -86,9 +86,9 @@ my.ui <- fluidPage (
                                            
                                            tags$li ("Itsumi Niiyama"), tags$ul (tags$li ("Major: Industrial Engineer"), tags$li ("Year: 2nd"),
                                                                                 
-                                                                                tags$li ("Fun Fact: I love soccer, kettle corn and lord of the rings")),
+                                                                                tags$li ("Fun Fact: I love soccer, kettle corn and lord of the rings.")),
                                            tags$li ("Tyler Muromoto"), tags$ul (tags$li ("Major: Intended Informatics"), tags$li ("Year: 2nd"),
-                                                                                tags$li ("Fun Fact: I enjoy playing piano and skiing, and I still have a baby tooth")))
+                                                                                tags$li ("Fun Fact: I enjoy playing piano and skiing, and I still have a baby tooth.")))
                         )),
               
               tabPanel ("Search", DTOutput ("output.all")),
