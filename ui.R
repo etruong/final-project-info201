@@ -94,7 +94,6 @@ my.ui <- fluidPage (
               tabPanel ("Search", DTOutput ("output.all")),
               
               tabPanel ("Location",
-
                         titlePanel("Best and Worst Business Locations"),
                         sidebarLayout(
                           sidebarPanel(
@@ -250,6 +249,7 @@ my.ui <- fluidPage (
                                           which would be the varying expectations of restaurants. This could be linked to the
                                           area in which the restaurant is, such as the competitiveness for the cuisine in an area
                                           or the average expectation level of a customer."),
+
                                        p ("From the types of cuisines and data analyzed, we can conclude that although there is not a 
                                           significant correlation between the cuisine and the rating, there are some cuisines that 
                                           tend to fare better than others. Although there is no one cuisine that is definitively 
