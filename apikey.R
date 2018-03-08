@@ -1,2 +1,0 @@
-api.key <- '2Uiy1jzNr3RpZfb1bA3Nb_Ora2G7WS59JQFRU-LxSvy_OmVKvLEcVz0gb2tDVwaMGL0XaN6hj_xKT_j_GAXmbKcrz-Zh4BH8I8JHDUZvKnb9pQZp-I7wT8wDzxaGWnYx'
-
