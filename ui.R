@@ -7,7 +7,6 @@ source ("project.R")
 
 yelp.data <- read.csv("data/zip-code-data.csv", stringsAsFactors = FALSE)
 
-
 cuisines <- str_cap_words(c("asianfusion", "cajun", "caribbean", "cantonese", "chinese", "french", "german", "greek", "hawaiian", "italian", 
                             "japanese", "korean", "mediterranean", "mexican", "newamerican", "taiwanese", "thai", 
                             "tradamerican", "vietnamese"))
@@ -41,7 +40,8 @@ my.ui <- fluidPage (
   
   includeCSS("styles.css"),
   
-  navbarPage (p (id = "app-title", tags$img (src = "logo.svg", width = "20px", height = "20px"), "Food Success"),
+  navbarPage (p (id = "app-title", 
+                 tags$img (src = "logo.svg", width = "20px", height = "20px"), "Food Success"),
               tabPanel ("Home", tags$div (id = "welcome-page",
                                           
                                           p (class = "center",
@@ -154,16 +154,14 @@ my.ui <- fluidPage (
                          mainPanel (
                            
                            tabsetPanel (
-                             tabPanel ("Plot", conditionalPanel (
-                               condition = "nrow (price.data()) != 0",
+                             tabPanel ("Plot",
                                h3 ("Food Prices Association with Restaraunt Ratings"), 
                                p ("The graph below plots the amount of restaraunts in Seattle
                                   of a specific rating and price, the y-axis is the count or number of
                                   restaraunts with the specific food price (x-axis). The colors depict
                                   the restaraunt's rating.", em ("Note: if the graph becomes grey this indicates we currently have no data
                                    that match the preferences and zipcode specified")),
-                               plotOutput ("price.plot")
-                             )),
+                               plotOutput ("price.plot")),
                              
                              tabPanel ("Summary", h3("Data Summary"), tableOutput ("price.summary")),
                              
