@@ -47,10 +47,13 @@ my.ui <- fluidPage (
                                           p (class = "center",
                                              tags$img (id = "main-logo", src = "logo.svg", width = "250px", height = "250px")), 
                                           h1 ("Welcome!", class = "center"), 
-                                          p (class = "center", "This application explores the Yelp Fusion API ( for more details ", 
-                                             a ("click here", href = "https://www.yelp.com/fusion"), ") to answer the question:"), 
+                                          p (class = "center", "This application explores the Yelp Fusion API", br (), "( for more details ", 
+                                             a ("click here", href = "https://www.yelp.com/fusion"), " or
+                                             see the sources tab ) to answer the question:"), 
                                           p (id = "main-ques", class = "center", "What factors make a successful food business?"),
-                                          p (class = "center", "Start exploring this application by clicking the above tabs")), 
+                                          p (class = "center", "We hope this application will help new business owners decide
+                                             important aspects of their restaraunts.", br (), 
+                                             "Start exploring this application by clicking the above tabs.")), 
                         tags$div (id = "index-section",
                                   h4 (class = "center", id = "index-title", "Index"),
                                   tags$ul (tags$li (class = "index", "Location: Does restaraunt locations influence the rating?"), 
@@ -59,18 +62,16 @@ my.ui <- fluidPage (
                                            tags$li (class = "index", "Cuisine: Which Types of Cuisines Are Most Successful in Seattle?"),
                                            tags$li (class = "index", "Price: Does food price determine a business' success rate?")))),
               
-              
               tabPanel ("About", h2 ("About", class = "center"), 
                         h3 ("The Project", class = "center divider"),
                         p (class = "center", em ("Food Success"), " was created for our INFO 201 (Technical Foundations of Informatics with Professor Joel Ross) assignment.
                            As a group, we were challenged to create our own application that would answer several critical questions
-                           about a specific dataset. The API of our choosing was the Yelp Fusion API because the dataset provided
-                           interesting data about food."),
-                        h3("Why", class = "center"),
+                           about a specific dataset."),
+                        h3("Why Yelp", class = "center"),
                         p(class = "center", "At first we wanted to look at which restaurants are good, so we could recommend consumers 
                           restaurants to try. But as we explored the dataset, we found a lot more information that we could analyze 
                           to determine elements of successful businesses."),
-                        h3("Who", class = "center"),
+                        h3("The User", class = "center"),
                         p(class = "center", "We believe business owners can use the information from our questions to aid their decision making 
                           when choosing to start a restaurant. They can read about our questions and conclusions, but also filter 
                           for data they are interested in to draw their own conclusions."),
@@ -113,8 +114,8 @@ my.ui <- fluidPage (
                             tabsetPanel(
                               tabPanel("Plot", plotOutput('location.plot', click = 'plot.click')),
                               tabPanel("Table", tableOutput('location.table')),
-                              tabPanel("Analysis",
-                                       "     Looking at the relationship between the zip code of a business and
+                              tabPanel("Analysis", h3 ("Analysis"),
+                                       "Looking at the relationship between the zip code of a business and
                                        its average rating provides information on whether the location of
                                        a business will affect the success of it. An assumption was made that the
                                        rating of a restaurant will affect the success of it because if a business has 
@@ -129,7 +130,7 @@ my.ui <- fluidPage (
                                        2.5 which is noticably different from 4.5. In conclusion, the question of, which locations are more likely for a 
                                        business to fail, cannot be clearly answered with this data because most of the average
                                        ratings for each zip code are very similar. Neverless there is an outlier, the zip code 98127 that had 
-                                       the lowest rating, which means that that business is most likely to fail.")),
+                                       the lowest rating, which means that that business is most likely to fail."), br ()),
                             verbatimTextOutput("info"),
                             verbatimTextOutput("map.info")))),
              
@@ -255,10 +256,6 @@ my.ui <- fluidPage (
                                           better, there are some that are more successful in the Seattle area, and thus should have 
                                           influence in one's decision of starting a business.")))))),
              
-             tabPanel("Review Ratings",
-                      tabPanel("Scatter", plotOutput('scatter'))
-             ),
-             
              tabPanel ("Hours",
                        titlePanel ("Restaraunt Hours"),
                        sidebarLayout(
@@ -322,7 +319,7 @@ my.ui <- fluidPage (
              ),
              
              tabPanel ("Conclusion", h2 ("Conclusion", class = "center"),
-                       p("   The main overarching question that was being answered was \"What factors make a 
+                       p("The main overarching question that was being answered was \"What factors make a 
                          successful food business?\". There were 4 questions that stemed off from this question which
                          led to a conclusion for the main question. All of the data we looked at had no signficant correlation
                          but we were able to draw some points that supports the answer to the main question. We concluded that

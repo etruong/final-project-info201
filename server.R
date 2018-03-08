@@ -161,14 +161,16 @@ my.server <- function (input, output, session) {
   ## Cuisine Section ##
   #####################
   
+  # filters yelp data with the user's chosen cuisine choices
+  # to use for the cuisine section
   observeEvent(input$cuisine, {
-
       cuisine.data$curr.data <- yelp.data %>%
                                 filter(category %in% input$cuisine) %>%
                                 select(name, category, rating, review_count)
-
   })
   
+  # updates the checkbox group input to select
+  # all values if select button pressed
   observeEvent(input$select.all, {
     updateCheckboxGroupInput(session,
                              'cuisine',
@@ -180,6 +182,8 @@ my.server <- function (input, output, session) {
       select(name, category, rating, review_count)
   })
   
+  # updates the checkbox group input to deselect
+  # all values if deselect button pressed
   observeEvent(input$deselect.all, {
     updateCheckboxGroupInput(session,
                              'cuisine',
@@ -192,6 +196,7 @@ my.server <- function (input, output, session) {
       select(name, category, rating, review_count)
   })
   
+  # outputs a box and whiskers plot of cuisine data
   output$cuisine.plot <- renderPlot({
     grouped.data <- cuisine.data$curr.data %>%
       group_by(category) %>%
@@ -204,6 +209,8 @@ my.server <- function (input, output, session) {
     return(plot)
   })
   
+  # outputs and returns a summary table in the cuisine
+  # section
   output$cuisine.table <- renderDataTable({
     summary <- cuisine.data$curr.data %>%
       group_by(category) %>%
@@ -214,6 +221,7 @@ my.server <- function (input, output, session) {
     return(summary)
   })
   
+  # outputs and returns the cuisines section conclusion
   output$cuisine.conclusion <- renderText({
     summary <- cuisine.data$curr.data %>%
       group_by(category) %>%
